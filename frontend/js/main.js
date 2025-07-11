@@ -210,50 +210,48 @@ startDateInput.addEventListener('change', handleApiParamsChange);
 typeFilter.addEventListener('change', applyFilters);
 statusFilter.addEventListener('change', applyFilters);
 waterfrontFilter.addEventListener('change', applyFilters);
-// Drag-to-select for days of the week
-let isDragging = false;
-let startDay = -1;
+// Click-to-select for days of the week, with shift-click for range selection
+let lastClickedDay = -1;
 
-daysOfWeekFilter.addEventListener('mousedown', (e) => {
+daysOfWeekFilter.addEventListener('click', (e) => {
     if (e.target.classList.contains('day-box')) {
-        isDragging = true;
-        const day = parseInt(e.target.dataset.day, 10);
-        startDay = day;
-        
-        if (!e.shiftKey) {
-            daysOfWeekFilter.querySelectorAll('.day-box').forEach(box => box.classList.remove('selected'));
-        }
-        
-        e.target.classList.toggle('selected');
-        applyDaysFilterButton.disabled = false; // Enable button
         e.preventDefault();
-    }
-});
-
-daysOfWeekFilter.addEventListener('mouseover', (e) => {
-    if (isDragging && e.target.classList.contains('day-box')) {
-        const currentDay = parseInt(e.target.dataset.day, 10);
         const dayBoxes = Array.from(daysOfWeekFilter.querySelectorAll('.day-box'));
-        const startIndex = dayBoxes.findIndex(box => parseInt(box.dataset.day, 10) === startDay);
-        const currentIndex = dayBoxes.findIndex(box => parseInt(box.dataset.day, 10) === currentDay);
+        const currentDayBox = e.target;
+        const currentDay = parseInt(currentDayBox.dataset.day, 10);
 
-        dayBoxes.forEach(box => box.classList.remove('selected'));
+        if (e.shiftKey && lastClickedDay !== -1) {
+            // Range selection
+            const lastIndex = dayBoxes.findIndex(box => parseInt(box.dataset.day, 10) === lastClickedDay);
+            const currentIndex = dayBoxes.findIndex(box => box === currentDayBox);
 
-        const min = Math.min(startIndex, currentIndex);
-        const max = Math.max(startIndex, currentIndex);
+            const min = Math.min(lastIndex, currentIndex);
+            const max = Math.max(lastIndex, currentIndex);
 
-        for (let i = min; i <= max; i++) {
-            dayBoxes[i].classList.add('selected');
+            for (let i = min; i <= max; i++) {
+                dayBoxes[i].classList.add('selected');
+            }
+        } else {
+            // Single day toggle
+            currentDayBox.classList.toggle('selected');
         }
-        applyDaysFilterButton.disabled = false; // Enable button
-    }
-});
 
-window.addEventListener('mouseup', () => {
-    if (isDragging) {
-        isDragging = false;
-        startDay = -1;
-        // No longer call applyFilters() here
+        // Update last clicked day for shift-click
+        if (currentDayBox.classList.contains('selected')) {
+            lastClickedDay = currentDay;
+        } else {
+            // If a day was just deselected, the concept of a "range from here" is gone.
+            const selectedBoxes = dayBoxes.filter(box => box.classList.contains('selected'));
+            if (selectedBoxes.length > 0) {
+                // set last clicked to the last selected day
+                lastClickedDay = parseInt(selectedBoxes[selectedBoxes.length - 1].dataset.day, 10);
+            } else {
+                lastClickedDay = -1;
+            }
+        }
+
+        const anySelected = daysOfWeekFilter.querySelector('.day-box.selected');
+        applyDaysFilterButton.disabled = !anySelected;
     }
 });
 
