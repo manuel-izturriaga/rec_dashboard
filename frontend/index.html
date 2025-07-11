@@ -48,16 +48,16 @@
                 <label for="waterfront-filter">Waterfront (11-41 Odd)</label>
             </div>
             <div class="filter-group">
-                <label for="days-of-week-filter">Show Availability For:</label>
-                <select id="days-of-week-filter" multiple size="7">
-                    <option value="0">Sunday</option>
-                    <option value="1">Monday</option>
-                    <option value="2">Tuesday</option>
-                    <option value="3">Wednesday</option>
-                    <option value="4">Thursday</option>
-                    <option value="5">Friday</option>
-                    <option value="6">Saturday</option>
-                </select>
+                <label>Show Availability For:</label>
+                <div id="days-of-week-filter" class="day-selector">
+                    <div class="day-box" data-day="1">Mon</div>
+                    <div class="day-box" data-day="2">Tue</div>
+                    <div class="day-box" data-day="3">Wed</div>
+                    <div class="day-box" data-day="4">Thu</div>
+                    <div class="day-box" data-day="5">Fri</div>
+                    <div class="day-box" data-day="6">Sat</div>
+                    <div class="day-box" data-day="0">Sun</div>
+                </div>
             </div>
             <div class="filter-group">
                 <button id="reset-filters">Reset Filters</button>

@@ -52,7 +52,7 @@ function applyFilters() {
     const selectedStatus = statusFilter.value;
     const isWaterfrontChecked = waterfrontFilter.checked;
     // Get selected day numbers from the multi-select (0 for Sun, 1 for Mon, etc.)
-    const selectedDays = Array.from(daysOfWeekFilter.selectedOptions).map(option => parseInt(option.value, 10));
+    const selectedDays = Array.from(daysOfWeekFilter.querySelectorAll('.day-box.selected')).map(box => parseInt(box.dataset.day, 10));
 
     const filteredCampsites = originalCampsites.filter(campsite => {
         // Type filter
@@ -86,8 +86,8 @@ function resetFilters() {
     statusFilter.value = 'all';
     waterfrontFilter.checked = false;
     // Clear all selected options in the days of week filter
-    Array.from(daysOfWeekFilter.options).forEach(option => {
-        option.selected = false;
+    Array.from(daysOfWeekFilter.querySelectorAll('.day-box')).forEach(box => {
+        box.classList.remove('selected');
     });
     // Reset campground ID and month to initial defaults
     campgroundIdInput.value = '232702';
@@ -131,7 +131,52 @@ startDateInput.addEventListener('change', handleApiParamsChange);
 typeFilter.addEventListener('change', applyFilters);
 statusFilter.addEventListener('change', applyFilters);
 waterfrontFilter.addEventListener('change', applyFilters);
-daysOfWeekFilter.addEventListener('change', applyFilters); // New listener for days of week filter
+// Drag-to-select for days of the week
+let isDragging = false;
+let startDay = -1;
+
+daysOfWeekFilter.addEventListener('mousedown', (e) => {
+    if (e.target.classList.contains('day-box')) {
+        isDragging = true;
+        const day = parseInt(e.target.dataset.day, 10);
+        startDay = day;
+        
+        // Clear previous selection if not holding shift
+        if (!e.shiftKey) {
+            daysOfWeekFilter.querySelectorAll('.day-box').forEach(box => box.classList.remove('selected'));
+        }
+        
+        e.target.classList.toggle('selected');
+        e.preventDefault(); // Prevent text selection
+    }
+});
+
+daysOfWeekFilter.addEventListener('mouseover', (e) => {
+    if (isDragging && e.target.classList.contains('day-box')) {
+        const currentDay = parseInt(e.target.dataset.day, 10);
+        const dayBoxes = Array.from(daysOfWeekFilter.querySelectorAll('.day-box'));
+        const startIndex = dayBoxes.findIndex(box => parseInt(box.dataset.day, 10) === startDay);
+        const currentIndex = dayBoxes.findIndex(box => parseInt(box.dataset.day, 10) === currentDay);
+
+        // Clear selection before reapplying
+        dayBoxes.forEach(box => box.classList.remove('selected'));
+
+        const min = Math.min(startIndex, currentIndex);
+        const max = Math.max(startIndex, currentIndex);
+
+        for (let i = min; i <= max; i++) {
+            dayBoxes[i].classList.add('selected');
+        }
+    }
+});
+
+window.addEventListener('mouseup', () => {
+    if (isDragging) {
+        isDragging = false;
+        startDay = -1;
+        applyFilters();
+    }
+});
 resetFiltersButton.addEventListener('click', resetFilters);
 
 // Initial load logic
