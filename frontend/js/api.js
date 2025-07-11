@@ -19,8 +19,6 @@ export async function fetchCombinedData(campgroundId, startDate) {
         const searchUrl = `${API_ENDPOINT_SEARCH}${campgroundId}&size=70`; // Fetch up to 70 campsites
         const availabilityUrl = `${API_ENDPOINT_AVAILABILITY}${campgroundId}/month?start_date=${encodedStartDate}`;
 
-        console.log("Fetching availability from:", availabilityUrl); // Log the URL to verify
-
         // Fetch both datasets concurrently
         const [searchResponse, availabilityResponse] = await Promise.all([
             fetch(searchUrl),
@@ -43,7 +41,6 @@ export async function fetchCombinedData(campgroundId, startDate) {
             return { ...campsite, availability: siteAvailability };
         });
 
-        console.log(`[api.js] Combined campsites data (first 3):`, combinedCampsites.slice(0, 3)); // DEBUG
         return { campsites: combinedCampsites };
 
     } catch (error) {
