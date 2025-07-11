@@ -40,6 +40,88 @@ function isGroupSite(campsite) {
 }
 
 /**
+ * Generates the HTML for a 7x5 calendar grid for a given month.
+ * @param {Date} startDate - The first day of the month to display.
+ * @param {Object} availability - The availability data for the campsite.
+ * @param {Array} selectedDays - Array of numbers representing selected days of the week (0-6).
+ * @returns {string} The HTML string for the calendar grid.
+ */
+function generateCalendarGrid(startDate, availability, selectedDays) {
+    let html = '<div class="daily-availability">';
+    const year = startDate.getFullYear();
+    const month = startDate.getMonth();
+    const daysInMonth = new Date(year, month + 1, 0).getDate();
+
+    // Add headers for days of the week
+    const dayHeaders = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+    dayHeaders.forEach(day => {
+        html += `<div class="day-header">${day}</div>`;
+    });
+
+    // Calculate the starting day of the week (0 for Sunday, 6 for Saturday)
+    const firstDayOfMonth = new Date(year, month, 1).getDay();
+    // Adjust to make Monday the first day of the week (Monday=0, Sunday=6)
+    const startOffset = (firstDayOfMonth === 0) ? 6 : firstDayOfMonth - 1;
+
+    // Add empty cells for padding at the beginning of the month
+    for (let i = 0; i < startOffset; i++) {
+        html += '<div class="day-cell empty-day"></div>';
+    }
+
+    // Add cells for each day of the month
+    for (let i = 1; i <= daysInMonth; i++) {
+        const currentDate = new Date(year, month, i);
+        const dayOfWeek = (currentDate.getDay() === 0) ? 6 : currentDate.getDay() - 1; // Monday=0
+
+        if (selectedDays.length === 0 || selectedDays.includes(currentDate.getDay())) {
+            const isoDate = new Date(Date.UTC(year, month, i)).toISOString().split('.')[0] + 'Z';
+            const dailyStatus = availability && availability[isoDate] ? availability[isoDate] : 'Unknown';
+
+            let statusClass = '';
+            let statusText = '';
+
+            switch (dailyStatus) {
+                case 'Available':
+                    statusClass = 'bg-green-700 text-white';
+                    statusText = 'A';
+                    break;
+                case 'Not Available':
+                case 'Reserved':
+                    statusClass = 'bg-red-700 text-white';
+                    statusText = 'X';
+                    break;
+                default:
+                    statusClass = 'bg-gray-700 text-gray-400';
+                    statusText = '?';
+                    break;
+            }
+
+            html += `
+                <div class="day-cell ${statusClass}" title="${dailyStatus}">
+                    <span class="day-num">${i}</span>
+                    <span class="day-status">${statusText}</span>
+                </div>`;
+        } else {
+            // If the day is filtered out, show it as an empty cell
+            html += `<div class="day-cell empty-day" title="Filtered out"><span class="day-num">${i}</span></div>`;
+        }
+    }
+
+    // Add empty cells to fill the rest of the grid (total 35 cells for 5 weeks)
+    const totalCells = startOffset + daysInMonth;
+    const remainingCells = (totalCells % 7 === 0) ? 0 : 7 - (totalCells % 7);
+    const finalCells = (totalCells + remainingCells) > 35 ? 42 : 35; // Use 6 weeks if needed
+
+    for (let i = 0; i < finalCells - totalCells; i++) {
+        html += '<div class="day-cell empty-day"></div>';
+    }
+
+    html += '</div>';
+    return html;
+}
+
+
+/**
  * Creates an HTML element for a single campsite card.
  * @param {Object} campsite - The campsite object.
  * @param {Date} currentStartDate - The start date for the availability calendar.
@@ -73,47 +155,7 @@ export function createCampsiteCard(campsite, currentStartDate, selectedDays = []
     if (accessible === 'Yes') amenities.push('Accessible');
 
     // --- Availability Display Logic ---
-    let availabilityHtml = '<div class="daily-availability">';
-    const startDate = currentStartDate;
-    const daysInMonth = new Date(startDate.getFullYear(), startDate.getMonth() + 1, 0).getDate();
-
-    for (let i = 0; i < daysInMonth; i++) {
-        const currentDate = new Date(startDate.getFullYear(), startDate.getMonth(), startDate.getDate() + i);
-        const dayOfWeek = currentDate.getDay(); // 0 for Sunday, 6 for Saturday
-        const dayOfMonth = currentDate.getDate();
-        const isoDate = new Date(Date.UTC(currentDate.getFullYear(), currentDate.getMonth(), currentDate.getDate())).toISOString().split('.')[0] + 'Z'; // Remove milliseconds entirely
-
-        // Only show if selectedDays is empty (show all) OR if the current day of week is in selectedDays
-        if (selectedDays.length === 0 || selectedDays.includes(dayOfWeek)) {
-            const dailyStatus = campsite.availability && campsite.availability[isoDate] ? campsite.availability[isoDate] : 'Unknown';
-
-            let statusClass = '';
-            let statusText = '';
-
-            switch (dailyStatus) {
-                case 'Available':
-                    statusClass = 'bg-green-700 text-white';
-                    statusText = 'A'; // Available
-                    break;
-                case 'Not Available':
-                case 'Reserved':
-                    statusClass = 'bg-red-700 text-white';
-                    statusText = 'X'; // Not Available / Reserved
-                    break;
-                default:
-                    statusClass = 'bg-gray-700 text-gray-400';
-                    statusText = '?'; // Unknown
-                    break;
-            }
-            availabilityHtml += `
-                <div class="day-cell ${statusClass} text-white" title="${dailyStatus}">
-                    <span class="day-num">${dayOfMonth}</span>
-                    <span class="day-status">${statusText}</span>
-                </div>
-            `;
-        }
-    }
-    availabilityHtml += '</div>';
+    const availabilityHtml = generateCalendarGrid(currentStartDate, campsite.availability, selectedDays);
     // --- End Availability Display Logic ---
 
     card.innerHTML = `
