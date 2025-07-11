@@ -46,6 +46,63 @@ function populateTypeFilter(campsites) {
 }
 
 /**
+ * Checks if a campsite has consecutive availability for the selected days of the week.
+ * @param {object} campsite - The campsite object.
+ * @param {number[]} selectedDays - An array of selected day numbers (0-6).
+ * @param {Date} startDate - The start date for the search month.
+ * @returns {boolean} - True if consecutive availability is found, false otherwise.
+ */
+function hasConsecutiveAvailability(campsite, selectedDays, startDate) {
+    if (selectedDays.length < 2) {
+        return true;
+    }
+
+    const sortedDays = [...selectedDays].sort((a, b) => a - b);
+    const availability = campsite.availability;
+
+    if (!availability || Object.keys(availability).length === 0) {
+        return false;
+    }
+
+    const year = startDate.getFullYear();
+    const month = startDate.getMonth();
+    const daysInMonth = new Date(year, month + 1, 0).getDate();
+
+    for (let day = 1; day <= daysInMonth; day++) {
+        const currentDate = new Date(Date.UTC(year, month, day));
+        const dayOfWeek = currentDate.getUTCDay();
+
+        if (dayOfWeek === sortedDays[0]) {
+            let isSequenceValid = true;
+            for (let i = 0; i < sortedDays.length; i++) {
+                const dayOffset = (sortedDays[i] - sortedDays[0] + 7) % 7;
+                const checkDate = new Date(currentDate);
+                checkDate.setUTCDate(currentDate.getUTCDate() + dayOffset);
+
+                if (checkDate.getUTCMonth() !== month) {
+                    isSequenceValid = false;
+                    break;
+                }
+
+                // Corrected the date format to remove milliseconds
+                const isoDate = checkDate.toISOString().split('T')[0] + 'T00:00:00Z';
+
+                if (availability[isoDate] !== "Available") {
+                    isSequenceValid = false;
+                    break;
+                }
+            }
+
+            if (isSequenceValid) {
+                return true;
+            }
+        }
+    }
+
+    return false;
+}
+
+/**
  * Applies filters to the original campsite data and updates the display.
  */
 function applyFilters() {
@@ -56,6 +113,13 @@ function applyFilters() {
     const selectedDays = Array.from(daysOfWeekFilter.querySelectorAll('.day-box.selected')).map(box => parseInt(box.dataset.day, 10));
 
     const filteredCampsites = originalCampsites.filter(campsite => {
+        // Consecutive days filter
+        if (selectedDays.length >= 2) {
+            if (!hasConsecutiveAvailability(campsite, selectedDays, currentStartDate)) {
+                return false;
+            }
+        }
+
         // Type filter
         if (selectedType !== 'all' && campsite.type !== selectedType) {
             return false;
