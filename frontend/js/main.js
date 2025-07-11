@@ -12,6 +12,7 @@ const resetFiltersButton = document.getElementById('reset-filters');
 const spGroupSitesDisplay = document.getElementById('sp-group-sites-display');
 const otherCampsitesDisplay = document.getElementById('other-campsites-display');
 const globalNoticesDiv = document.getElementById('global-notices');
+const applyDaysFilterButton = document.getElementById('apply-days-filter');
 
 // Global data stores
 let originalCampsites = [];
@@ -105,6 +106,7 @@ function resetFilters() {
     // Reset campground ID and month to initial defaults
     campgroundSelect.value = '232702';
     currentCampgroundId = '232702';
+    applyDaysFilterButton.disabled = true; // Add this line
     currentStartDate = new Date();
     currentStartDate.setMonth(currentStartDate.getMonth() + 1); // Set to first day of NEXT month
     currentStartDate.setDate(1);
@@ -154,13 +156,13 @@ daysOfWeekFilter.addEventListener('mousedown', (e) => {
         const day = parseInt(e.target.dataset.day, 10);
         startDay = day;
         
-        // Clear previous selection if not holding shift
         if (!e.shiftKey) {
             daysOfWeekFilter.querySelectorAll('.day-box').forEach(box => box.classList.remove('selected'));
         }
         
         e.target.classList.toggle('selected');
-        e.preventDefault(); // Prevent text selection
+        applyDaysFilterButton.disabled = false; // Enable button
+        e.preventDefault();
     }
 });
 
@@ -171,7 +173,6 @@ daysOfWeekFilter.addEventListener('mouseover', (e) => {
         const startIndex = dayBoxes.findIndex(box => parseInt(box.dataset.day, 10) === startDay);
         const currentIndex = dayBoxes.findIndex(box => parseInt(box.dataset.day, 10) === currentDay);
 
-        // Clear selection before reapplying
         dayBoxes.forEach(box => box.classList.remove('selected'));
 
         const min = Math.min(startIndex, currentIndex);
@@ -180,6 +181,7 @@ daysOfWeekFilter.addEventListener('mouseover', (e) => {
         for (let i = min; i <= max; i++) {
             dayBoxes[i].classList.add('selected');
         }
+        applyDaysFilterButton.disabled = false; // Enable button
     }
 });
 
@@ -187,8 +189,13 @@ window.addEventListener('mouseup', () => {
     if (isDragging) {
         isDragging = false;
         startDay = -1;
-        applyFilters();
+        // No longer call applyFilters() here
     }
+});
+
+applyDaysFilterButton.addEventListener('click', () => {
+    applyFilters();
+    applyDaysFilterButton.disabled = true; // Disable after applying
 });
 resetFiltersButton.addEventListener('click', resetFilters);
 

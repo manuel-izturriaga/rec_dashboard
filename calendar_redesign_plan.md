@@ -1,65 +1,147 @@
-# Plan to Redesign the Availability Calendar
+# Plan: Multi-Day Availability Filter
 
-This plan outlines the steps to transform the current linear daily availability view into a 7x5 weekly grid calendar, starting on Monday.
+This document outlines the plan to update the "days availability" filter to allow for multiple day selections with a manual "Apply" button.
 
-## 1. Update JavaScript Logic in `frontend/js/ui.js`
+## 1. Proposed Solution
 
-The core of the change will be within the `createCampsiteCard` function in `frontend/js/ui.js`. The existing `for` loop for availability will be replaced with new logic to build the grid.
+The proposed solution is to enhance the existing day selection UI by adding an "Apply" button. This will give users explicit control over when the filter is applied, improving the overall user experience.
 
-### New Logic Outline:
+- **UI:** Keep the current toggle-style buttons for days of the week.
+- **Interaction:** Remove the automatic filtering on `mouseup` and trigger filtering only when the new "Apply" button is clicked.
 
-1.  **Calculate Grid Start:**
-    *   Get the first day of the selected month.
-    *   Determine the day of the week for the first day (e.g., Wednesday).
-    *   Calculate the number of "padding" days needed at the beginning of the calendar to make the week start on a Monday. For example, if the month starts on a Wednesday, we need 2 empty cells for Monday and Tuesday. The logic will adjust JavaScript's `getDay()` (where Sunday is 0) to a Monday-first week.
-
-2.  **Generate Grid Cells:**
-    *   Create a loop that runs for the total number of cells in the grid (5 weeks * 7 days = 35 cells).
-    *   Inside the loop:
-        *   For padding days, render an empty, disabled-looking cell.
-        *   For actual days of the month, render a cell with the day number and its availability status (Available, Reserved, Unknown).
-        *   For days after the end of the month, render more empty, disabled-looking cells to fill out the grid.
-
-3.  **HTML Structure for the Grid:**
-    *   The `availabilityHtml` will be structured using a main container with `display: grid` and 7 columns.
-    *   A header row for the days of the week (Mon, Tue, Wed, Thu, Fri, Sat, Sun) will be added.
-
-### Mermaid Diagram of the new `createCampsiteCard` availability logic:
+## 2. User Flow
 
 ```mermaid
 graph TD
-    A[Start createCampsiteCard] --> B{Get currentStartDate};
-    B --> C{Calculate first day of month and its day-of-week};
-    C --> D{Calculate number of blank days for Monday start};
-    D --> E[Initialize availabilityHtml with grid container and header];
-    E --> F{Loop 35 times for 5x7 grid};
-    F --> G{Is it a blank day before month starts?};
-    G -- Yes --> H[Add empty cell HTML];
-    G -- No --> I{Is it a valid day of the month?};
-    I -- Yes --> J[Get availability status for the day];
-    J --> K[Add styled day cell HTML with status];
-    I -- No --> L[Add empty cell HTML for after month ends];
-    H --> M[Continue Loop];
-    K --> M;
-    L --> M;
-    M -- Loop Finished --> N[Close grid container];
-    N --> O[Inject availabilityHtml into card];
-    O --> P[End];
+    A[User sees the 'Show Availability For:' filter] --> B{Selects/Deselects days};
+    B --> C[Day selection changes];
+    C --> D[Apply button is enabled];
+    D --> E{User clicks 'Apply'};
+    E --> F[Campsite list is updated];
+    A --> G{User changes another filter};
+    G --> F;
 ```
 
-## 2. Update CSS in `frontend/css/style.css`
+## 3. Implementation Details
 
-The CSS will be modified to support the new grid layout.
+### `frontend/index.html`
 
-1.  **Modify `.daily-availability`:**
-    *   Change `grid-template-columns` to `repeat(7, 1fr)` to create a strict 7-column layout.
-    *   Remove `repeat(auto-fit, minmax(25px, 1fr))`.
+- **Add "Apply" button:**
+  In the `filter-group` for the day selector, add a button:
+  ```html
+  <div class="filter-group">
+      <label>Show Availability For:</label>
+      <div id="days-of-week-filter" class="day-selector">
+          <div class="day-box" data-day="1">Mon</div>
+          <div class="day-box" data-day="2">Tue</div>
+          <div class="day-box" data-day="3">Wed</div>
+          <div class="day-box" data-day="4">Thu</div>
+          <div class="day-box" data-day="5">Fri</div>
+          <div class="day-box" data-day="6">Sat</div>
+          <div class="day-box" data-day="0">Sun</div>
+      </div>
+      <button id="apply-days-filter" class="ml-2" disabled>Apply</button>
+  </div>
+  ```
 
-2.  **Add New Styles:**
-    *   Create a style for the calendar header cells (`.day-header`).
-    *   Create a style for the empty/padding cells (`.empty-day`) to make them visually distinct.
-    *   Ensure the `.day-cell` styles work well within the new fixed grid.
+### `frontend/css/style.css`
 
-## 3. No Changes to `index.html` or `main.js`
+- **Style the "Apply" button:**
+  Add the following CSS to style the new button and its disabled state:
+  ```css
+  #apply-days-filter {
+      background-color: #4a5568;
+      border-color: #63b3ed;
+      transition: background-color 0.2s ease;
+      padding: 8px 12px;
+      border-radius: 8px;
+      font-size: 0.9rem;
+      cursor: pointer;
+      height: 40px;
+  }
 
-The changes are contained within the component generation (`ui.js`) and its styling (`style.css`), so no changes are anticipated for `frontend/index.html` or `frontend/js/main.js`.
+  #apply-days-filter:hover:not(:disabled) {
+      background-color: #63b3ed;
+      color: #1b1c1d;
+  }
+
+  #apply-days-filter:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+  }
+  ```
+
+### `frontend/js/main.js`
+
+- **Get reference to the new button:**
+  ```javascript
+  const applyDaysFilterButton = document.getElementById('apply-days-filter');
+  ```
+
+- **Modify event listeners:**
+  - Remove the `applyFilters()` call from the `mouseup` event listener.
+  - Add a `click` listener to the new button.
+  - Enable the button when a day selection is made.
+
+  The updated event listener section should look like this:
+
+  ```javascript
+  // (keep the existing isDragging and startDay variables)
+
+  daysOfWeekFilter.addEventListener('mousedown', (e) => {
+      if (e.target.classList.contains('day-box')) {
+          isDragging = true;
+          const day = parseInt(e.target.dataset.day, 10);
+          startDay = day;
+          
+          if (!e.shiftKey) {
+              daysOfWeekFilter.querySelectorAll('.day-box').forEach(box => box.classList.remove('selected'));
+          }
+          
+          e.target.classList.toggle('selected');
+          applyDaysFilterButton.disabled = false; // Enable button
+          e.preventDefault();
+      }
+  });
+
+  daysOfWeekFilter.addEventListener('mouseover', (e) => {
+      if (isDragging && e.target.classList.contains('day-box')) {
+          const currentDay = parseInt(e.target.dataset.day, 10);
+          const dayBoxes = Array.from(daysOfWeekFilter.querySelectorAll('.day-box'));
+          const startIndex = dayBoxes.findIndex(box => parseInt(box.dataset.day, 10) === startDay);
+          const currentIndex = dayBoxes.findIndex(box => parseInt(box.dataset.day, 10) === currentDay);
+
+          dayBoxes.forEach(box => box.classList.remove('selected'));
+
+          const min = Math.min(startIndex, currentIndex);
+          const max = Math.max(startIndex, currentIndex);
+
+          for (let i = min; i <= max; i++) {
+              dayBoxes[i].classList.add('selected');
+          }
+          applyDaysFilterButton.disabled = false; // Enable button
+      }
+  });
+
+  window.addEventListener('mouseup', () => {
+      if (isDragging) {
+          isDragging = false;
+          startDay = -1;
+          // No longer call applyFilters() here
+      }
+  });
+
+  applyDaysFilterButton.addEventListener('click', () => {
+      applyFilters();
+      applyDaysFilterButton.disabled = true; // Disable after applying
+  });
+  ```
+
+- **Update `resetFilters` function:**
+  Add a line to disable the "Apply" button when filters are reset.
+  ```javascript
+  function resetFilters() {
+      // ... (existing code)
+      applyDaysFilterButton.disabled = true; // Add this line
+      handleApiParamsChange();
+  }

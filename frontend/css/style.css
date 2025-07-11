@@ -469,3 +469,40 @@ a.campsite-card, a.campsite-card:hover {
     color: #1b1c1d;
     border-color: #63b3ed;
 }
+#apply-days-filter {
+    background-color: #4a5568;
+    border-color: #63b3ed;
+    transition: background-color 0.2s ease;
+    padding: 8px 12px;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    cursor: pointer;
+    height: 40px;
+}
+
+#apply-days-filter:hover:not(:disabled) {
+    background-color: #63b3ed;
+    color: #1b1c1d;
+}
+
+#apply-days-filter:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+/* Availability Controls Container */
+.availability-controls {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+#reset-filters {
+    background-color: #718096; /* A different color to distinguish */
+    color: #e2e8f0;
+    border-color: #a0aec0;
+}
+
+#reset-filters:hover {
+    background-color: #a0aec0;
+    color: #1a202c;
+}

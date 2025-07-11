@@ -51,19 +51,20 @@
                 <label for="waterfront-filter">Waterfront</label>
             </div>
             <div class="filter-group">
-                <label>Show Availability For:</label>
-                <div id="days-of-week-filter" class="day-selector">
-                    <div class="day-box" data-day="1">Mon</div>
-                    <div class="day-box" data-day="2">Tue</div>
-                    <div class="day-box" data-day="3">Wed</div>
-                    <div class="day-box" data-day="4">Thu</div>
-                    <div class="day-box" data-day="5">Fri</div>
-                    <div class="day-box" data-day="6">Sat</div>
-                    <div class="day-box" data-day="0">Sun</div>
+                <!--<label>Show Availability For:</label>-->
+                <div class="availability-controls">
+                    <div id="days-of-week-filter" class="day-selector">
+                        <div class="day-box" data-day="1">Mon</div>
+                        <div class="day-box" data-day="2">Tue</div>
+                        <div class="day-box" data-day="3">Wed</div>
+                        <div class="day-box" data-day="4">Thu</div>
+                        <div class="day-box" data-day="5">Fri</div>
+                        <div class="day-box" data-day="6">Sat</div>
+                        <div class="day-box" data-day="0">Sun</div>
+                    </div>
+                    <button id="apply-days-filter" disabled>Apply</button>
+                    <button id="reset-filters">Reset Filters</button>
                 </div>
-            </div>
-            <div class="filter-group">
-                <button id="reset-filters">Reset Filters</button>
             </div>
         </div>
 
