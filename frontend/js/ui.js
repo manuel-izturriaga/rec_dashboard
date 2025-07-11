@@ -86,17 +86,7 @@ export function createCampsiteCard(campsite, currentStartDate, selectedDays = []
         // Only show if selectedDays is empty (show all) OR if the current day of week is in selectedDays
         if (selectedDays.length === 0 || selectedDays.includes(dayOfWeek)) {
             const dailyStatus = campsite.availability && campsite.availability[isoDate] ? campsite.availability[isoDate] : 'Unknown';
-            // --- DEBUG: Log first few lookups for the first campsite ---
-            if (index === 0 && i < 3) {
-                const lookupResult = campsite.availability[isoDate];
-                console.group(`[ui.js] Day ${dayOfMonth} (Campsite ID: ${campsite.campsite_id})`);
-                console.log(`Lookup Key (isoDate):`, isoDate);
-                console.log(`Availability Object:`, campsite.availability);
-                console.log(`Lookup Result (campsite.availability[isoDate]):`, lookupResult, `(Type: ${typeof lookupResult})`);
-                console.log(`Final Status (dailyStatus):`, dailyStatus);
-                console.groupEnd();
-            }
-            // --- End DEBUG ---
+
             let statusClass = '';
             let statusText = '';
 
