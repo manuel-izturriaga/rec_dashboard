@@ -39,10 +39,11 @@ export async function fetchCombinedData(campgroundId, startDate) {
         // Combine campsite details with their corresponding availability
         const combinedCampsites = searchData.campsites.map(campsite => {
             // Link availability by campsite_id
-            const siteAvailability = availabilityData[campsite.campsite_id] || {};
+            const siteAvailability = availabilityData[campsite.campsite_id]?.availabilities || {};
             return { ...campsite, availability: siteAvailability };
         });
 
+        console.log(`[api.js] Combined campsites data (first 3):`, combinedCampsites.slice(0, 3)); // DEBUG
         return { campsites: combinedCampsites };
 
     } catch (error) {
