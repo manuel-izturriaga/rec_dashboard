@@ -106,9 +106,11 @@ function resetFilters() {
  */
 async function handleApiParamsChange() {
     currentCampgroundId = campgroundIdInput.value;
-    // Ensure start date is always the 1st of the selected month
-    const selectedDate = new Date(startDateInput.value);
+    // Ensure start date is always the 1st of the selected month, avoiding timezone issues.
+    // By adding a time, we prevent JS from defaulting to UTC and shifting the date.
+    const selectedDate = new Date(`${startDateInput.value}-01T12:00:00`);
     currentStartDate = new Date(selectedDate.getFullYear(), selectedDate.getMonth(), 1);
+    console.log(`[main.js] handleApiParamsChange: currentStartDate set to:`, currentStartDate.toString()); // DEBUG
 
     // Fetch and display initial data
     const data = await fetchCombinedData(currentCampgroundId, currentStartDate);

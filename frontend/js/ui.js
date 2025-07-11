@@ -46,7 +46,7 @@ function isGroupSite(campsite) {
  * @param {Array} selectedDays - Array of numbers representing selected days of the week (0-6).
  * @returns {HTMLElement} The campsite card element.
  */
-export function createCampsiteCard(campsite, currentStartDate, selectedDays = []) {
+export function createCampsiteCard(campsite, currentStartDate, selectedDays = [], index = -1) {
     const card = document.createElement('div');
     card.classList.add('campsite-card');
 
@@ -81,11 +81,22 @@ export function createCampsiteCard(campsite, currentStartDate, selectedDays = []
         const currentDate = new Date(startDate.getFullYear(), startDate.getMonth(), startDate.getDate() + i);
         const dayOfWeek = currentDate.getDay(); // 0 for Sunday, 6 for Saturday
         const dayOfMonth = currentDate.getDate();
-        const isoDate = currentDate.toISOString().split('T')[0]; // YYYY-MM-DD
+        const isoDate = new Date(Date.UTC(currentDate.getFullYear(), currentDate.getMonth(), currentDate.getDate())).toISOString().split('.')[0] + 'Z'; // Remove milliseconds entirely
 
         // Only show if selectedDays is empty (show all) OR if the current day of week is in selectedDays
         if (selectedDays.length === 0 || selectedDays.includes(dayOfWeek)) {
             const dailyStatus = campsite.availability && campsite.availability[isoDate] ? campsite.availability[isoDate] : 'Unknown';
+            // --- DEBUG: Log first few lookups for the first campsite ---
+            if (index === 0 && i < 3) {
+                const lookupResult = campsite.availability[isoDate];
+                console.group(`[ui.js] Day ${dayOfMonth} (Campsite ID: ${campsite.campsite_id})`);
+                console.log(`Lookup Key (isoDate):`, isoDate);
+                console.log(`Availability Object:`, campsite.availability);
+                console.log(`Lookup Result (campsite.availability[isoDate]):`, lookupResult, `(Type: ${typeof lookupResult})`);
+                console.log(`Final Status (dailyStatus):`, dailyStatus);
+                console.groupEnd();
+            }
+            // --- End DEBUG ---
             let statusClass = '';
             let statusText = '';
 
@@ -105,7 +116,7 @@ export function createCampsiteCard(campsite, currentStartDate, selectedDays = []
                     break;
             }
             availabilityHtml += `
-                <div class="day-cell ${statusClass} text-white">
+                <div class="day-cell ${statusClass} text-white" title="${dailyStatus}">
                     <span class="day-num">${dayOfMonth}</span>
                     <span class="day-status">${statusText}</span>
                 </div>
@@ -183,7 +194,7 @@ export function displayCampsites(campsitesToDisplay, currentStartDate, selectedD
     let otherCampsitesFound = false;
 
     if (campsitesToDisplay && Array.isArray(campsitesToDisplay) && campsitesToDisplay.length > 0) {
-        campsitesToDisplay.forEach(campsite => {
+        campsitesToDisplay.forEach((campsite, index) => {
             // Filter notices for the global section (only SEWER_NOTICE)
             if (campsite.notices && campsite.notices.length > 0) {
                 campsite.notices.forEach(notice => {
@@ -193,7 +204,7 @@ export function displayCampsites(campsitesToDisplay, currentStartDate, selectedD
                 });
             }
 
-            const card = createCampsiteCard(campsite, currentStartDate, selectedDays);
+            const card = createCampsiteCard(campsite, currentStartDate, selectedDays, index);
 
             if (isGroupSite(campsite)) {
                 spGroupSitesDisplay.appendChild(card);

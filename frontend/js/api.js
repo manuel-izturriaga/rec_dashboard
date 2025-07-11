@@ -32,6 +32,8 @@ export async function fetchCombinedData(campgroundId, startDate) {
 
         const searchData = await searchResponse.json();
         const availabilityJson = await availabilityResponse.json();
+        console.log(`[api.js] Raw searchData:`, searchData); // DEBUG
+        console.log(`[api.js] Raw availabilityJson:`, availabilityJson); // DEBUG
 
         // Store availability data globally for easy lookup
         const availabilityData = availabilityJson.campsites || {};
@@ -43,6 +45,7 @@ export async function fetchCombinedData(campgroundId, startDate) {
             return { ...campsite, availability: siteAvailability };
         });
 
+        console.log(`[api.js] Combined campsites data (first 3):`, combinedCampsites.slice(0, 3)); // DEBUG
         return { campsites: combinedCampsites };
 
     } catch (error) {
