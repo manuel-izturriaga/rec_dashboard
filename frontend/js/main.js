@@ -2,7 +2,7 @@ import { fetchCombinedData } from './api.js';
 import { displayCampsites } from './ui.js';
 
 // DOM elements
-const campgroundIdInput = document.getElementById('campground-id-input');
+const campgroundSelect = document.getElementById('campground-select');
 const startDateInput = document.getElementById('start-date-input');
 const typeFilter = document.getElementById('type-filter');
 const statusFilter = document.getElementById('status-filter');
@@ -65,10 +65,23 @@ function applyFilters() {
             return false;
         }
 
-        // Waterfront filter (odd numbers between 11 and 41)
+        // Waterfront filter with conditional logic based on campground name
         if (isWaterfrontChecked) {
             const siteNumber = parseInt(campsite.name, 10);
-            if (isNaN(siteNumber) || siteNumber % 2 === 0 || siteNumber < 11 || siteNumber > 41) {
+            if (isNaN(siteNumber)) return false; // Not a numbered site, filter it out
+
+            const selectedCampgroundName = campgroundSelect.options[campgroundSelect.selectedIndex].text;
+
+            if (selectedCampgroundName === "Anderson Road") {
+                if (siteNumber < 1 || siteNumber > 9) {
+                    return false;
+                }
+            } else if (selectedCampgroundName === "Seven Points") {
+                if (siteNumber < 11 || siteNumber > 35 || siteNumber % 2 === 0) {
+                    return false;
+                }
+            } else {
+                // If waterfront is checked for a campground without special rules, filter out all sites.
                 return false;
             }
         }
@@ -90,7 +103,7 @@ function resetFilters() {
         box.classList.remove('selected');
     });
     // Reset campground ID and month to initial defaults
-    campgroundIdInput.value = '232702';
+    campgroundSelect.value = '232702';
     currentCampgroundId = '232702';
     currentStartDate = new Date();
     currentStartDate.setMonth(currentStartDate.getMonth() + 1); // Set to first day of NEXT month
@@ -105,7 +118,7 @@ function resetFilters() {
  * Triggers a re-fetch of data and then re-applies filters.
  */
 async function handleApiParamsChange() {
-    currentCampgroundId = campgroundIdInput.value;
+    currentCampgroundId = campgroundSelect.value;
     // Ensure start date is always the 1st of the selected month, avoiding timezone issues.
     // By adding a time, we prevent JS from defaulting to UTC and shifting the date.
     const selectedDate = new Date(`${startDateInput.value}-01T12:00:00`);
@@ -126,7 +139,7 @@ async function handleApiParamsChange() {
 }
 
 // Event Listeners for filters
-campgroundIdInput.addEventListener('change', handleApiParamsChange);
+campgroundSelect.addEventListener('change', handleApiParamsChange);
 startDateInput.addEventListener('change', handleApiParamsChange);
 typeFilter.addEventListener('change', applyFilters);
 statusFilter.addEventListener('change', applyFilters);
@@ -182,7 +195,7 @@ resetFiltersButton.addEventListener('click', resetFilters);
 // Initial load logic
 window.onload = async function() {
     // Set default values for inputs on load
-    campgroundIdInput.value = currentCampgroundId;
+    campgroundSelect.value = currentCampgroundId;
     // Format currentStartDate to YYYY-MM for the month input
     startDateInput.value = `${currentStartDate.getFullYear()}-${(currentStartDate.getMonth() + 1).toString().padStart(2, '0')}`;
 
