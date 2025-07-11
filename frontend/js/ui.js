@@ -85,7 +85,7 @@ export function createCampsiteCard(campsite, currentStartDate, selectedDays = []
 
         // Only show if selectedDays is empty (show all) OR if the current day of week is in selectedDays
         if (selectedDays.length === 0 || selectedDays.includes(dayOfWeek)) {
-            const dailyStatus = campsite.availability && campsite.availability[isoDate] ? campsite.availability[isoDate].status : 'Unknown';
+            const dailyStatus = campsite.availability && campsite.availability[isoDate] ? campsite.availability[isoDate] : 'Unknown';
             let statusClass = '';
             let statusText = '';
 
