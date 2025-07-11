@@ -1,0 +1,419 @@
+body {
+    font-family: 'Inter', sans-serif;
+    background-color: #1b1c1d; /* User requested dark background */
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    min-height: 100vh;
+    padding: 20px;
+    box-sizing: border-box;
+    color: #e2e8f0; /* Light text color */
+}
+.cards-wrapper {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 20px;
+    max-width: 1200px;
+    width: 100%;
+}
+h1 {
+    color: #e2e8f0; /* Light color for main title */
+    margin-bottom: 20px; /* Space below main title */
+}
+.section-title {
+    color: #e2e8f0;
+    font-size: 1.8rem; /* Larger for section titles */
+    font-weight: 700;
+    width: 100%;
+    text-align: center;
+    margin-top: 30px;
+    margin-bottom: 15px;
+    padding-bottom: 10px;
+    border-bottom: 2px solid #555555;
+}
+/* Filter Section Styling */
+#filter-section {
+    background-color: #2b2b2b; /* Card background color */
+    border: 4px solid #555555; /* Card border color */
+    border-radius: 16px;
+    padding: 20px;
+    margin-bottom: 30px;
+    width: 100%;
+    max-width: 900px; /* Increased max width for filters */
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 15px;
+    align-items: flex-end; /* Align items to the bottom */
+}
+.filter-group {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 5px;
+}
+.filter-group label {
+    color: #e2e8f0;
+    font-size: 0.9rem;
+    font-weight: 600;
+}
+.filter-group input[type="text"],
+.filter-group input[type="month"],
+.filter-group select,
+.filter-group button {
+    background-color: #3a3a3a; /* Stats section background */
+    border: 1px solid #555555;
+    color: #e2e8f0;
+    padding: 8px 12px;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    cursor: pointer;
+    appearance: none; /* Remove default select arrow */
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22 width%3D%22292.4%22 height%3D%22292.4%22 viewBox%3D%220 0 292.4 292.4%22%3E%3Cpath fill%3D%22%23e2e8f0%22 d%3D%22M287 69.4a17.6 17.6 0 0 0-13-5.4H18.4c-5 0-9.3 1.8-12.9 5.4A17.6 17.6 0 0 0 0 82.2c0 5 1.8 9.3 5.4 12.9l128 128c3.6 3.6 7.8 5.4 12.8 5.4s9.2-1.8 12.9-5.4l128-128c3.6-3.6 5.4-7.8 5.4-12.8s-1.8-9.2-5.4-12.9z%22%2F%3E%3C%2Fsvg%3E');
+    background-repeat: no-repeat;
+    background-position: right 10px top 50%;
+    background-size: 12px auto;
+}
+.filter-group input[type="text"] {
+    background-image: none; /* No arrow for text input */
+}
+.filter-group select[multiple] {
+    height: auto; /* Allow multiple select to grow */
+    min-height: 100px; /* Minimum height for multiple select */
+    background-image: none; /* No arrow for multiple select */
+}
+.filter-group select:focus,
+.filter-group input[type="text"]:focus,
+.filter-group input[type="month"]:focus,
+.filter-group button:focus,
+.filter-group input[type="checkbox"]:focus + label {
+    outline: none;
+    border-color: #63b3ed;
+    box-shadow: 0 0 0 2px rgba(99, 179, 237, 0.5);
+}
+.filter-group input[type="checkbox"] {
+    display: none; /* Hide default checkbox */
+}
+.filter-group input[type="checkbox"] + label {
+    background-color: #3a3a3a;
+    border: 1px solid #555555;
+    color: #e2e8f0;
+    padding: 8px 12px;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: background-color 0.2s ease, border-color 0.2s ease;
+}
+.filter-group input[type="checkbox"] + label::before {
+    content: '';
+    display: inline-block;
+    width: 16px;
+    height: 16px;
+    border: 2px solid #63b3ed;
+    border-radius: 4px;
+    background-color: #2b2b2b;
+    transition: background-color 0.2s ease, border-color 0.2s ease;
+}
+.filter-group input[type="checkbox"]:checked + label::before {
+    background-color: #63b3ed; /* Blue when checked */
+    border-color: #63b3ed;
+    content: '✔'; /* Checkmark */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 12px;
+    color: #1b1c1d; /* Dark checkmark */
+}
+.filter-group button {
+    background-color: #4a5568; /* Darker grey for button */
+    border-color: #63b3ed;
+    transition: background-color 0.2s ease;
+}
+.filter-group button:hover {
+    background-color: #63b3ed;
+    color: #1b1c1d;
+}
+
+.campsite-card {
+    background: linear-gradient(145deg, #333333, #222222); /* Slightly lighter card background */
+    border: 4px solid #555555; /* Adjusted border for lighter card background */
+    border-radius: 16px;
+    padding: 12px;
+    margin-bottom: 0;
+    text-align: left;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
+    position: relative;
+    overflow: hidden;
+    transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+    background-image: url("data:image/svg+xml,%3Csvg width='6' height='6' viewBox='0 0 6 6' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%2363b3ed' fill-opacity='0.05' fill-rule='evenodd'%3E%3Cpath d='M5 0h1L0 6V5zM6 5v1H5z'/%3E%3C/g%3E%3C/svg%3E");
+    
+    width: calc(50% - 10px);
+    min-width: 280px;
+    max-width: 350px;
+}
+
+@media (max-width: 640px) {
+    .campsite-card {
+        width: 100%;
+        max-width: 320px;
+    }
+}
+@media (min-width: 1024px) {
+    .campsite-card {
+        width: calc(33.33% - 14px);
+    }
+}
+
+.campsite-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 12px 24px rgba(0, 0, 0, 0.4);
+}
+
+/* Card Header */
+.card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 6px;
+    padding-bottom: 4px;
+    border-bottom: 2px solid #63b3ed; /* Lighter blue divider */
+}
+.card-header h2 {
+    font-size: 1.3rem;
+    font-weight: 800;
+    color: #e2e8f0; /* Light text for name */
+    text-shadow: 1px 1px 2px rgba(0,0,0,0.2);
+}
+.card-header .campsite-id {
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: #a0aec0; /* Lighter grey for ID */
+}
+
+/* Type Badge */
+.type-badge {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background-color: #f6e05e; /* Brighter yellow */
+    color: #92400e;
+    padding: 4px 8px;
+    border-radius: 9999px;
+    font-weight: 700;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+    z-index: 10;
+}
+
+/* Image */
+.campsite-image {
+    width: 100%;
+    margin: 0 auto 10px auto;
+    display: block;
+    max-height: 140px;
+    object-fit: cover;
+    border-radius: 8px;
+    box-shadow: inset 0 0 6px rgba(0,0,0,0.2);
+}
+
+/* New Meta Section (Status & Rating) */
+.card-meta {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+    font-size: 0.85rem;
+    color: #cbd5e0; /* Light grey text */
+    padding: 4px 0;
+    border-bottom: 1px dashed #4a5568; /* Darker subtle separator */
+}
+.status-indicator {
+    font-weight: 700;
+    padding: 2px 5px;
+    border-radius: 5px;
+    display: inline-block;
+    font-size: 0.8rem;
+}
+.status-open {
+    background-color: #38a169; /* Darker green */
+    color: #e6fffa;
+}
+.status-closed {
+    background-color: #e53e3e; /* Darker red */
+    color: #fed7d7;
+}
+.rating-display {
+    display: flex;
+    align-items: center;
+    gap: 3px;
+}
+.rating-stars {
+    color: #f6e05e; /* Brighter yellow stars */
+    font-size: 1em;
+}
+
+/* Stats Section */
+.stats-section {
+    background-color: #3a3a3a; /* Slightly lighter than card background */
+    border-radius: 8px;
+    padding: 8px 10px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 5px 8px;
+    font-size: 0.8rem;
+    color: #e2e8f0; /* Light text */
+    border: 1px solid #555555; /* Border matching card */
+}
+.stats-section strong {
+    color: #e2e8f0;
+}
+.stats-item {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+.stats-item.full-width {
+    grid-column: span 2;
+    justify-content: center;
+    text-align: center;
+}
+
+/* Abilities/Features Section */
+.abilities-section {
+    background-color: #3a3a3a; /* Slightly lighter than card background */
+    border-radius: 8px;
+    padding: 8px 10px;
+    font-size: 0.8rem;
+    color: #e0f2fe;
+    border: 1px solid #555555; /* Border matching card */
+}
+.abilities-section h3 {
+    font-weight: 700;
+    color: #90cdf4;
+    margin-bottom: 5px;
+}
+.abilities-section ul {
+    list-style: none;
+    padding: 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 3px;
+}
+.abilities-section ul li {
+    background-color: #4a5568; /* Darker grey for features */
+    border-radius: 6px;
+    padding: 2px 6px;
+    font-size: 0.7rem;
+    font-weight: 500;
+    color: #e0f2fe;
+}
+
+/* Check-in/Check-out spanning */
+.checkin-checkout {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 0.85rem;
+    color: #cbd5e0;
+}
+.checkin-checkout strong {
+    color: #e2e8f0;
+}
+
+/* Daily Availability Section */
+.daily-availability {
+    margin-top: 10px;
+    padding-top: 8px;
+    border-top: 1px dashed #4a5568;
+    font-size: 0.7rem; /* Smaller font for daily info */
+    color: #cbd5e0;
+    text-align: center;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(25px, 1fr)); /* Responsive grid for days */
+    gap: 2px; /* Smaller gap */
+}
+.daily-availability .day-cell {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 4px 2px; /* Smaller padding */
+    border-radius: 4px;
+    min-width: 25px; /* Ensure consistent width */
+    box-shadow: inset 0 0 3px rgba(0,0,0,0.2);
+    font-weight: 600;
+}
+.daily-availability .day-cell.bg-green-700 { background-color: #065f46; } /* Darker green */
+.daily-availability .day-cell.bg-red-700 { background-color: #991b1b; } /* Darker red */
+.daily-availability .day-cell.bg-gray-700 { background-color: #4a5568; } /* Darker gray */
+.daily-availability .day-cell.text-white { color: #e2e8f0; }
+.daily-availability .day-cell.text-gray-400 { color: #a0aec0; }
+.daily-availability .day-num {
+    font-size: 0.7rem;
+}
+.daily-availability .day-status {
+    font-size: 0.6rem; /* Even smaller for status char */
+    font-weight: bold;
+}
+
+
+/* Global Notices Section */
+.global-notices-section {
+    background-color: #4a2c0d; /* Darker warning shade */
+    border: 1px solid #d69e2e;
+    border-radius: 8px;
+    padding: 15px;
+    margin-bottom: 20px; /* Space before cards */
+    width: 100%;
+    max-width: 800px; /* Max width for the notice box */
+    box-sizing: border-box;
+    text-align: left;
+    margin-left: auto;
+    margin-right: auto;
+}
+.global-notices-section h3 {
+    font-weight: 600;
+    color: #f6ad55;
+    margin-bottom: 10px;
+    font-size: 1.1rem;
+}
+.global-notices-section ul {
+    list-style: disc;
+    padding-left: 20px;
+    color: #fbd38d;
+}
+.global-notices-section ul li {
+    margin-bottom: 5px;
+}
+
+/* Message Box styles */
+.message-box {
+    background-color: #2d3748;
+    border: 1px solid #ecc94b;
+    color: #f6e05e;
+    padding: 15px;
+    border-radius: 8px;
+    margin-top: 20px;
+    text-align: left;
+}
+.message-box.info {
+    background-color: #2b6cb0;
+    border-color: #63b3ed;
+    color: #90cdf4;
+}
+.message-box.error {
+    background-color: #c53030;
+    border-color: #fc8181;
+    color: #fed7d7;
+}

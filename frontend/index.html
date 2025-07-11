@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Campsite Cards with Availability & Filters</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div class="cards-wrapper">
+        <h1 class="text-3xl font-bold mb-6 w-full text-center">Your Campsite Collection</h1>
+        
+        <div id="global-notices" class="global-notices-section hidden">
+            <h3>⚠️ Important Notices for this Campground:</h3>
+            <ul id="notices-list">
+                <!-- Notices will be populated here -->
+            </ul>
+        </div>
+
+        <div id="filter-section">
+            <div class="filter-group">
+                <label for="campground-id-input">Campground ID:</label>
+                <input type="text" id="campground-id-input" value="232702">
+            </div>
+            <div class="filter-group">
+                <label for="start-date-input">Month:</label>
+                <input type="month" id="start-date-input">
+            </div>
+            <div class="filter-group">
+                <label for="type-filter">Campsite Type:</label>
+                <select id="type-filter">
+                    <option value="all">All Types</option>
+                    <!-- Options will be populated by JS -->
+                </select>
+            </div>
+            <div class="filter-group">
+                <label for="status-filter">Status:</label>
+                <select id="status-filter">
+                    <option value="all">All Statuses</option>
+                    <option value="Open">Open</option>
+                    <option value="Closed">Closed</option>
+                </select>
+            </div>
+            <div class="filter-group">
+                <input type="checkbox" id="waterfront-filter">
+                <label for="waterfront-filter">Waterfront (11-41 Odd)</label>
+            </div>
+            <div class="filter-group">
+                <label for="days-of-week-filter">Show Availability For:</label>
+                <select id="days-of-week-filter" multiple size="7">
+                    <option value="0">Sunday</option>
+                    <option value="1">Monday</option>
+                    <option value="2">Tuesday</option>
+                    <option value="3">Wednesday</option>
+                    <option value="4">Thursday</option>
+                    <option value="5">Friday</option>
+                    <option value="6">Saturday</option>
+                </select>
+            </div>
+            <div class="filter-group">
+                <button id="reset-filters">Reset Filters</button>
+            </div>
+        </div>
+
+        <h2 class="section-title">SP/Group Sites</h2>
+        <div id="sp-group-sites-display" class="w-full flex flex-wrap justify-center gap-5">
+            <p class="text-gray-600 w-full text-center">No SP/Group sites found.</p>
+        </div>
+
+        <h2 class="section-title">Other Campsites</h2>
+        <div id="other-campsites-display" class="w-full flex flex-wrap justify-center gap-5">
+            <p class="text-gray-600 w-full text-center">No other campsites found.</p>
+        </div>
+    </div>
+
+    <script src="js/main.js" type="module"></script>
+</body>
+</html>

@@ -1,0 +1,22 @@
+{
+  "name": "rec_dashboard",
+  "version": "1.0.0",
+  "description": "A web application to display campground site availability.",
+  "main": "backend/server.js",
+  "scripts": {
+    "start": "bun run backend/server.js"
+  },
+  "keywords": [
+    "campground",
+    "availability",
+    "recreation"
+  ],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@types/bun": "latest"
+  },
+  "peerDependencies": {
+    "typescript": "^5.0.0"
+  }
+}

@@ -1,0 +1,929 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Campsite Cards with Availability & Filters</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #1b1c1d; /* User requested dark background */
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            min-height: 100vh;
+            padding: 20px;
+            box-sizing: border-box;
+            color: #e2e8f0; /* Light text color */
+        }
+        .cards-wrapper {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 20px;
+            max-width: 1200px;
+            width: 100%;
+        }
+        h1 {
+            color: #e2e8f0; /* Light color for main title */
+            margin-bottom: 20px; /* Space below main title */
+        }
+        .section-title {
+            color: #e2e8f0;
+            font-size: 1.8rem; /* Larger for section titles */
+            font-weight: 700;
+            width: 100%;
+            text-align: center;
+            margin-top: 30px;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #555555;
+        }
+        /* Filter Section Styling */
+        #filter-section {
+            background-color: #2b2b2b; /* Card background color */
+            border: 4px solid #555555; /* Card border color */
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 30px;
+            width: 100%;
+            max-width: 900px; /* Increased max width for filters */
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 15px;
+            align-items: flex-end; /* Align items to the bottom */
+        }
+        .filter-group {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 5px;
+        }
+        .filter-group label {
+            color: #e2e8f0;
+            font-size: 0.9rem;
+            font-weight: 600;
+        }
+        .filter-group input[type="text"],
+        .filter-group input[type="month"],
+        .filter-group select,
+        .filter-group button {
+            background-color: #3a3a3a; /* Stats section background */
+            border: 1px solid #555555;
+            color: #e2e8f0;
+            padding: 8px 12px;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            cursor: pointer;
+            appearance: none; /* Remove default select arrow */
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22 width%3D%22292.4%22 height%3D%22292.4%22 viewBox%3D%220 0 292.4 292.4%22%3E%3Cpath fill%3D%22%23e2e8f0%22 d%3D%22M287 69.4a17.6 17.6 0 0 0-13-5.4H18.4c-5 0-9.3 1.8-12.9 5.4A17.6 17.6 0 0 0 0 82.2c0 5 1.8 9.3 5.4 12.9l128 128c3.6 3.6 7.8 5.4 12.8 5.4s9.2-1.8 12.9-5.4l128-128c3.6-3.6 5.4-7.8 5.4-12.8s-1.8-9.2-5.4-12.9z%22%2F%3E%3C%2Fsvg%3E');
+            background-repeat: no-repeat;
+            background-position: right 10px top 50%;
+            background-size: 12px auto;
+        }
+        .filter-group input[type="text"] {
+            background-image: none; /* No arrow for text input */
+        }
+        .filter-group select[multiple] {
+            height: auto; /* Allow multiple select to grow */
+            min-height: 100px; /* Minimum height for multiple select */
+            background-image: none; /* No arrow for multiple select */
+        }
+        .filter-group select:focus,
+        .filter-group input[type="text"]:focus,
+        .filter-group input[type="month"]:focus,
+        .filter-group button:focus,
+        .filter-group input[type="checkbox"]:focus + label {
+            outline: none;
+            border-color: #63b3ed;
+            box-shadow: 0 0 0 2px rgba(99, 179, 237, 0.5);
+        }
+        .filter-group input[type="checkbox"] {
+            display: none; /* Hide default checkbox */
+        }
+        .filter-group input[type="checkbox"] + label {
+            background-color: #3a3a3a;
+            border: 1px solid #555555;
+            color: #e2e8f0;
+            padding: 8px 12px;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: background-color 0.2s ease, border-color 0.2s ease;
+        }
+        .filter-group input[type="checkbox"] + label::before {
+            content: '';
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            border: 2px solid #63b3ed;
+            border-radius: 4px;
+            background-color: #2b2b2b;
+            transition: background-color 0.2s ease, border-color 0.2s ease;
+        }
+        .filter-group input[type="checkbox"]:checked + label::before {
+            background-color: #63b3ed; /* Blue when checked */
+            border-color: #63b3ed;
+            content: '✔'; /* Checkmark */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 12px;
+            color: #1b1c1d; /* Dark checkmark */
+        }
+        .filter-group button {
+            background-color: #4a5568; /* Darker grey for button */
+            border-color: #63b3ed;
+            transition: background-color 0.2s ease;
+        }
+        .filter-group button:hover {
+            background-color: #63b3ed;
+            color: #1b1c1d;
+        }
+
+        .campsite-card {
+            background: linear-gradient(145deg, #333333, #222222); /* Slightly lighter card background */
+            border: 4px solid #555555; /* Adjusted border for lighter card background */
+            border-radius: 16px;
+            padding: 12px;
+            margin-bottom: 0;
+            text-align: left;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
+            position: relative;
+            overflow: hidden;
+            transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+            background-image: url("data:image/svg+xml,%3Csvg width='6' height='6' viewBox='0 0 6 6' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%2363b3ed' fill-opacity='0.05' fill-rule='evenodd'%3E%3Cpath d='M5 0h1L0 6V5zM6 5v1H5z'/%3E%3C/g%3E%3C/svg%3E");
+            
+            width: calc(50% - 10px);
+            min-width: 280px;
+            max-width: 350px;
+        }
+
+        @media (max-width: 640px) {
+            .campsite-card {
+                width: 100%;
+                max-width: 320px;
+            }
+        }
+        @media (min-width: 1024px) {
+            .campsite-card {
+                width: calc(33.33% - 14px);
+            }
+        }
+
+        .campsite-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 24px rgba(0, 0, 0, 0.4);
+        }
+
+        /* Card Header */
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 6px;
+            padding-bottom: 4px;
+            border-bottom: 2px solid #63b3ed; /* Lighter blue divider */
+        }
+        .card-header h2 {
+            font-size: 1.3rem;
+            font-weight: 800;
+            color: #e2e8f0; /* Light text for name */
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.2);
+        }
+        .card-header .campsite-id {
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: #a0aec0; /* Lighter grey for ID */
+        }
+
+        /* Type Badge */
+        .type-badge {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background-color: #f6e05e; /* Brighter yellow */
+            color: #92400e;
+            padding: 4px 8px;
+            border-radius: 9999px;
+            font-weight: 700;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+            z-index: 10;
+        }
+
+        /* Image */
+        .campsite-image {
+            width: 100%;
+            margin: 0 auto 10px auto;
+            display: block;
+            max-height: 140px;
+            object-fit: cover;
+            border-radius: 8px;
+            box-shadow: inset 0 0 6px rgba(0,0,0,0.2);
+        }
+
+        /* New Meta Section (Status & Rating) */
+        .card-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+            font-size: 0.85rem;
+            color: #cbd5e0; /* Light grey text */
+            padding: 4px 0;
+            border-bottom: 1px dashed #4a5568; /* Darker subtle separator */
+        }
+        .status-indicator {
+            font-weight: 700;
+            padding: 2px 5px;
+            border-radius: 5px;
+            display: inline-block;
+            font-size: 0.8rem;
+        }
+        .status-open {
+            background-color: #38a169; /* Darker green */
+            color: #e6fffa;
+        }
+        .status-closed {
+            background-color: #e53e3e; /* Darker red */
+            color: #fed7d7;
+        }
+        .rating-display {
+            display: flex;
+            align-items: center;
+            gap: 3px;
+        }
+        .rating-stars {
+            color: #f6e05e; /* Brighter yellow stars */
+            font-size: 1em;
+        }
+
+        /* Stats Section */
+        .stats-section {
+            background-color: #3a3a3a; /* Slightly lighter than card background */
+            border-radius: 8px;
+            padding: 8px 10px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 5px 8px;
+            font-size: 0.8rem;
+            color: #e2e8f0; /* Light text */
+            border: 1px solid #555555; /* Border matching card */
+        }
+        .stats-section strong {
+            color: #e2e8f0;
+        }
+        .stats-item {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+        .stats-item.full-width {
+            grid-column: span 2;
+            justify-content: center;
+            text-align: center;
+        }
+
+        /* Abilities/Features Section */
+        .abilities-section {
+            background-color: #3a3a3a; /* Slightly lighter than card background */
+            border-radius: 8px;
+            padding: 8px 10px;
+            font-size: 0.8rem;
+            color: #e0f2fe;
+            border: 1px solid #555555; /* Border matching card */
+        }
+        .abilities-section h3 {
+            font-weight: 700;
+            color: #90cdf4;
+            margin-bottom: 5px;
+        }
+        .abilities-section ul {
+            list-style: none;
+            padding: 0;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 3px;
+        }
+        .abilities-section ul li {
+            background-color: #4a5568; /* Darker grey for features */
+            border-radius: 6px;
+            padding: 2px 6px;
+            font-size: 0.7rem;
+            font-weight: 500;
+            color: #e0f2fe;
+        }
+
+        /* Check-in/Check-out spanning */
+        .checkin-checkout {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.85rem;
+            color: #cbd5e0;
+        }
+        .checkin-checkout strong {
+            color: #e2e8f0;
+        }
+
+        /* Daily Availability Section */
+        .daily-availability {
+            margin-top: 10px;
+            padding-top: 8px;
+            border-top: 1px dashed #4a5568;
+            font-size: 0.7rem; /* Smaller font for daily info */
+            color: #cbd5e0;
+            text-align: center;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(25px, 1fr)); /* Responsive grid for days */
+            gap: 2px; /* Smaller gap */
+        }
+        .daily-availability .day-cell {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 4px 2px; /* Smaller padding */
+            border-radius: 4px;
+            min-width: 25px; /* Ensure consistent width */
+            box-shadow: inset 0 0 3px rgba(0,0,0,0.2);
+            font-weight: 600;
+        }
+        .daily-availability .day-cell.bg-green-700 { background-color: #065f46; } /* Darker green */
+        .daily-availability .day-cell.bg-red-700 { background-color: #991b1b; } /* Darker red */
+        .daily-availability .day-cell.bg-gray-700 { background-color: #4a5568; } /* Darker gray */
+        .daily-availability .day-cell.text-white { color: #e2e8f0; }
+        .daily-availability .day-cell.text-gray-400 { color: #a0aec0; }
+        .daily-availability .day-num {
+            font-size: 0.7rem;
+        }
+        .daily-availability .day-status {
+            font-size: 0.6rem; /* Even smaller for status char */
+            font-weight: bold;
+        }
+
+
+        /* Global Notices Section */
+        .global-notices-section {
+            background-color: #4a2c0d; /* Darker warning shade */
+            border: 1px solid #d69e2e;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 20px; /* Space before cards */
+            width: 100%;
+            max-width: 800px; /* Max width for the notice box */
+            box-sizing: border-box;
+            text-align: left;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        .global-notices-section h3 {
+            font-weight: 600;
+            color: #f6ad55;
+            margin-bottom: 10px;
+            font-size: 1.1rem;
+        }
+        .global-notices-section ul {
+            list-style: disc;
+            padding-left: 20px;
+            color: #fbd38d;
+        }
+        .global-notices-section ul li {
+            margin-bottom: 5px;
+        }
+
+        /* Message Box styles */
+        .message-box {
+            background-color: #2d3748;
+            border: 1px solid #ecc94b;
+            color: #f6e05e;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 20px;
+            text-align: left;
+        }
+        .message-box.info {
+            background-color: #2b6cb0;
+            border-color: #63b3ed;
+            color: #90cdf4;
+        }
+        .message-box.error {
+            background-color: #c53030;
+            border-color: #fc8181;
+            color: #fed7d7;
+        }
+    </style>
+</head>
+<body>
+    <div class="cards-wrapper">
+        <h1 class="text-3xl font-bold mb-6 w-full text-center">Your Campsite Collection</h1>
+        
+        <div id="global-notices" class="global-notices-section hidden">
+            <h3>⚠️ Important Notices for this Campground:</h3>
+            <ul id="notices-list">
+                <!-- Notices will be populated here -->
+            </ul>
+        </div>
+
+        <div id="filter-section">
+            <div class="filter-group">
+                <label for="campground-id-input">Campground ID:</label>
+                <input type="text" id="campground-id-input" value="232702">
+            </div>
+            <div class="filter-group">
+                <label for="start-date-input">Month:</label>
+                <input type="month" id="start-date-input">
+            </div>
+            <div class="filter-group">
+                <label for="type-filter">Campsite Type:</label>
+                <select id="type-filter">
+                    <option value="all">All Types</option>
+                    <!-- Options will be populated by JS -->
+                </select>
+            </div>
+            <div class="filter-group">
+                <label for="status-filter">Status:</label>
+                <select id="status-filter">
+                    <option value="all">All Statuses</option>
+                    <option value="Open">Open</option>
+                    <option value="Closed">Closed</option>
+                </select>
+            </div>
+            <div class="filter-group">
+                <input type="checkbox" id="waterfront-filter">
+                <label for="waterfront-filter">Waterfront (11-41 Odd)</label>
+            </div>
+            <div class="filter-group">
+                <label for="days-of-week-filter">Show Availability For:</label>
+                <select id="days-of-week-filter" multiple size="7">
+                    <option value="0">Sunday</option>
+                    <option value="1">Monday</option>
+                    <option value="2">Tuesday</option>
+                    <option value="3">Wednesday</option>
+                    <option value="4">Thursday</option>
+                    <option value="5">Friday</option>
+                    <option value="6">Saturday</option>
+                </select>
+            </div>
+            <div class="filter-group">
+                <button id="reset-filters">Reset Filters</button>
+            </div>
+        </div>
+
+        <h2 class="section-title">SP/Group Sites</h2>
+        <div id="sp-group-sites-display" class="w-full flex flex-wrap justify-center gap-5">
+            <p class="text-gray-600 w-full text-center">No SP/Group sites found.</p>
+        </div>
+
+        <h2 class="section-title">Other Campsites</h2>
+        <div id="other-campsites-display" class="w-full flex flex-wrap justify-center gap-5">
+            <p class="text-gray-600 w-full text-center">No other campsites found.</p>
+        </div>
+    </div>
+
+    <script>
+        // Define API endpoints
+        const API_ENDPOINT_SEARCH = 'https://www.recreation.gov/api/search/campsites?fq=asset_id%3A';
+        const API_ENDPOINT_AVAILABILITY = 'https://www.recreation.gov/api/camps/availability/campground/';
+
+        // DOM elements
+        const campgroundIdInput = document.getElementById('campground-id-input');
+        const startDateInput = document.getElementById('start-date-input');
+        const typeFilter = document.getElementById('type-filter');
+        const statusFilter = document.getElementById('status-filter');
+        const waterfrontFilter = document.getElementById('waterfront-filter');
+        const daysOfWeekFilter = document.getElementById('days-of-week-filter');
+        const resetFiltersButton = document.getElementById('reset-filters');
+        const spGroupSitesDisplay = document.getElementById('sp-group-sites-display');
+        const otherCampsitesDisplay = document.getElementById('other-campsites-display');
+        const globalNoticesDiv = document.getElementById('global-notices');
+        const noticesList = document.getElementById('notices-list');
+
+        // Global data stores
+        let originalCampsites = [];
+        let availabilityData = {}; // Stores availability fetched from the second endpoint
+        let currentCampgroundId = '232702'; // Default campground ID
+        let currentStartDate = new Date(); // Default to current month
+        currentStartDate.setMonth(currentStartDate.getMonth() + 1); // Set to first day of NEXT month
+        currentStartDate.setDate(1); // Set to first day of the month
+
+        // Specific notice to filter for global display
+        const SEWER_NOTICE = "Please note that there are no sewer hook ups at the campground.";
+
+        /**
+         * Helper function to find an attribute value by name from the attributes array.
+         * @param {Array} attributes - The array of attribute objects.
+         * @param {string} name - The name of the attribute to find.
+         * @returns {string} The attribute value or 'N/A' if not found.
+         */
+        function getAttributeValue(attributes, name) {
+            const attribute = attributes.find(attr => attr.attribute_name === name);
+            return attribute ? attribute.attribute_value : 'N/A';
+        }
+
+        /**
+         * Generates star emojis based on a rating.
+         * @param {number} rating - The numerical rating (e.g., 4.5).
+         * @returns {string} HTML string of star emojis.
+         */
+        function getStarRating(rating) {
+            if (typeof rating !== 'number' || isNaN(rating)) return '';
+            const fullStars = '⭐'.repeat(Math.floor(rating));
+            const halfStar = rating % 1 >= 0.5 ? '🌟' : ''; // Using a different emoji for half star
+            return `<span class="rating-stars">${fullStars}${halfStar}</span>`;
+        }
+
+        /**
+         * Fetches campsite details and availability data from the Recreation.gov API.
+         * Combines availability data with campsite details.
+         * @param {string} campgroundId - The ID of the campground.
+         * @param {Date} startDate - The start date for availability (first of the month).
+         * @returns {Promise<Object|null>} An object containing combined campsite data, or null on error.
+         */
+        async function fetchData(campgroundId, startDate) {
+            try {
+                // Set the date to midnight UTC (00:00:00.000Z) before converting to ISO string
+                const midnightStartDateUTC = new Date(Date.UTC(startDate.getFullYear(), startDate.getMonth(), startDate.getDate(), 0, 0, 0, 0));
+                const isoFormattedDate = midnightStartDateUTC.toISOString();
+                const encodedStartDate = encodeURIComponent(isoFormattedDate);
+
+                const searchUrl = `${API_ENDPOINT_SEARCH}${campgroundId}&size=70`; // Fetch up to 70 campsites
+                const availabilityUrl = `${API_ENDPOINT_AVAILABILITY}${campgroundId}/month?start_date=${encodedStartDate}`;
+
+                console.log("Fetching availability from:", availabilityUrl); // Log the URL to verify
+
+                // Fetch both datasets concurrently
+                const [searchResponse, availabilityResponse] = await Promise.all([
+                    fetch(searchUrl),
+                    fetch(availabilityUrl)
+                ]);
+
+                if (!searchResponse.ok) throw new Error(`Search API error! status: ${searchResponse.status}`);
+                if (!availabilityResponse.ok) throw new Error(`Availability API error! status: ${availabilityResponse.status}`);
+
+                const searchData = await searchResponse.json();
+                const availabilityJson = await availabilityResponse.json();
+
+                // Store availability data globally for easy lookup
+                availabilityData = availabilityJson.campsites || {};
+
+                // Combine campsite details with their corresponding availability
+                const combinedCampsites = searchData.campsites.map(campsite => {
+                    // Link availability by campsite_id
+                    const siteAvailability = availabilityData[campsite.campsite_id] || {};
+                    return { ...campsite, availability: siteAvailability };
+                });
+
+                return { campsites: combinedCampsites };
+
+            } catch (error) {
+                console.error('Error fetching data:', error);
+                // Display error message in the main content area
+                const errorMessageHtml = `
+                    <div class="message-box error w-full">
+                        <p>Failed to load data. Please check the console for more details.</p>
+                        <p>Error: ${error.message}</p>
+                    </div>
+                `;
+                spGroupSitesDisplay.innerHTML = errorMessageHtml;
+                otherCampsitesDisplay.innerHTML = ''; // Clear other section
+                globalNoticesDiv.classList.add('hidden'); // Hide notices
+                return null;
+            }
+        }
+
+        /**
+         * Determines if a campsite should be categorized as an "SP/Group Site".
+         * This logic is a heuristic based on common naming conventions.
+         * You may need to adjust this based on the actual data from your API.
+         * @param {Object} campsite - The campsite object.
+         * @returns {boolean} True if it's an SP/Group site, false otherwise.
+         */
+        function isGroupSite(campsite) {
+            const type = campsite.type ? campsite.type.toUpperCase() : '';
+            const name = campsite.name ? campsite.name.toUpperCase() : '';
+            const reserveType = campsite.campsite_reserve_type ? campsite.campsite_reserve_type.toUpperCase() : '';
+
+            // Common indicators for group sites or special sites
+            return type.includes('GROUP') || type.includes('SP') ||
+                   name.includes('GROUP') || name.includes('SP') ||
+                   reserveType.includes('GROUP');
+        }
+
+        /**
+         * Populates the Type filter dropdown with unique campsite types.
+         * @param {Array} campsites - The array of campsite objects.
+         */
+        function populateTypeFilter(campsites) {
+            const uniqueTypes = new Set();
+            campsites.forEach(campsite => {
+                if (campsite.type) {
+                    uniqueTypes.add(campsite.type);
+                }
+            });
+
+            // Clear existing options except "All Types"
+            typeFilter.innerHTML = '<option value="all">All Types</option>';
+
+            // Add unique types
+            Array.from(uniqueTypes).sort().forEach(type => {
+                const option = document.createElement('option');
+                option.value = type;
+                option.textContent = type;
+                typeFilter.appendChild(option);
+            });
+        }
+
+        /**
+         * Applies filters to the original campsite data and updates the display.
+         */
+        function applyFilters() {
+            const selectedType = typeFilter.value;
+            const selectedStatus = statusFilter.value;
+            const isWaterfrontChecked = waterfrontFilter.checked;
+            // Get selected day numbers from the multi-select (0 for Sun, 1 for Mon, etc.)
+            const selectedDays = Array.from(daysOfWeekFilter.selectedOptions).map(option => parseInt(option.value, 10));
+
+            const filteredCampsites = originalCampsites.filter(campsite => {
+                // Type filter
+                if (selectedType !== 'all' && campsite.type !== selectedType) {
+                    return false;
+                }
+
+                // Status filter
+                if (selectedStatus !== 'all' && campsite.campsite_status !== selectedStatus) {
+                    return false;
+                }
+
+                // Waterfront filter (odd numbers between 11 and 41)
+                if (isWaterfrontChecked) {
+                    const siteNumber = parseInt(campsite.name, 10);
+                    if (isNaN(siteNumber) || siteNumber % 2 === 0 || siteNumber < 11 || siteNumber > 41) {
+                        return false;
+                    }
+                }
+                return true;
+            });
+
+            displayData(filteredCampsites, selectedDays); // Pass selectedDays to displayData
+        }
+
+        /**
+         * Resets all filters to their default values and re-applies them.
+         */
+        function resetFilters() {
+            typeFilter.value = 'all';
+            statusFilter.value = 'all';
+            waterfrontFilter.checked = false;
+            // Clear all selected options in the days of week filter
+            Array.from(daysOfWeekFilter.options).forEach(option => {
+                option.selected = false;
+            });
+            // Reset campground ID and month to initial defaults
+            campgroundIdInput.value = '232702';
+            currentCampgroundId = '232702';
+            currentStartDate = new Date();
+            currentStartDate.setMonth(currentStartDate.getMonth() + 1); // Set to first day of NEXT month
+            currentStartDate.setDate(1);
+            startDateInput.value = `${currentStartDate.getFullYear()}-${(currentStartDate.getMonth() + 1).toString().padStart(2, '0')}`;
+
+            handleApiParamsChange(); // Re-fetch data with reset parameters
+        }
+
+        /**
+         * Displays the campsite details in structured card formats and global notices.
+         * @param {Array} campsitesToDisplay - The array of campsite objects to render.
+         * @param {Array} selectedDays - Array of numbers representing selected days of the week (0-6).
+         */
+        function displayData(campsitesToDisplay, selectedDays = []) {
+            spGroupSitesDisplay.innerHTML = ''; // Clear previous content
+            otherCampsitesDisplay.innerHTML = ''; // Clear previous content
+            noticesList.innerHTML = ''; // Clear previous notices
+
+            const uniqueNotices = new Set(); // Use a Set to store unique notice texts
+
+            let spGroupSitesFound = false;
+            let otherCampsitesFound = false;
+
+            if (campsitesToDisplay && Array.isArray(campsitesToDisplay) && campsitesToDisplay.length > 0) {
+                campsitesToDisplay.forEach(campsite => {
+                    // Filter notices for the global section (only SEWER_NOTICE)
+                    if (campsite.notices && campsite.notices.length > 0) {
+                        campsite.notices.forEach(notice => {
+                            if (notice.text === SEWER_NOTICE) {
+                                uniqueNotices.add(notice.text);
+                            }
+                        });
+                    }
+
+                    const card = document.createElement('div');
+                    card.classList.add('campsite-card');
+
+                    // Extract common attributes using the helper function
+                    const electricHookup = getAttributeValue(campsite.attributes, 'Electric Hookup');
+                    const waterHookup = getAttributeValue(campsite.attributes, 'Water Hookup');
+                    const checkinTime = getAttributeValue(campsite.attributes, 'Checkin Time');
+                    const checkoutTime = getAttributeValue(campsite.attributes, 'Checkout Time');
+                    const siteLength = getAttributeValue(campsite.attributes, 'Site Length');
+                    const maxVehicleLength = getAttributeValue(campsite.attributes, 'Max Vehicle Length');
+                    const drivewaySurface = getAttributeValue(campsite.attributes, 'Driveway Surface');
+                    const drivewayEntry = getAttributeValue(campsite.attributes, 'Driveway Entry');
+                    const accessible = campsite.accessible === 'true' ? 'Yes' : 'No';
+
+                    // Collect amenities from the 'amenities' category in attributes
+                    const amenities = campsite.attributes
+                        .filter(attr => attr.attribute_category === 'amenities' && attr.attribute_value === 'Y')
+                        .map(attr => attr.attribute_name.replace(' Hookup', '')); // Clean up name for display
+
+                    // Add other relevant attributes as amenities if they are 'Yes'
+                    if (getAttributeValue(campsite.attributes, 'Campfire Allowed') === 'Yes') amenities.push('Campfire');
+                    if (getAttributeValue(campsite.attributes, 'Shade') === 'Yes') amenities.push('Shade');
+                    if (getAttributeValue(campsite.attributes, 'Pets Allowed') === 'Yes') amenities.push('Pets Allowed');
+                    if (accessible === 'Yes') amenities.push('Accessible');
+
+                    // --- Availability Display Logic ---
+                    let availabilityHtml = '<div class="daily-availability">';
+                    const startDate = currentStartDate;
+                    const daysInMonth = new Date(startDate.getFullYear(), startDate.getMonth() + 1, 0).getDate();
+
+                    for (let i = 0; i < daysInMonth; i++) {
+                        const currentDate = new Date(startDate.getFullYear(), startDate.getMonth(), startDate.getDate() + i);
+                        const dayOfWeek = currentDate.getDay(); // 0 for Sunday, 6 for Saturday
+                        const dayOfMonth = currentDate.getDate();
+                        const isoDate = currentDate.toISOString().split('T')[0]; // YYYY-MM-DD
+
+                        // Only show if selectedDays is empty (show all) OR if the current day of week is in selectedDays
+                        if (selectedDays.length === 0 || selectedDays.includes(dayOfWeek)) {
+                            const dailyStatus = campsite.availability && campsite.availability[isoDate] ? campsite.availability[isoDate].status : 'Unknown';
+                            let statusClass = '';
+                            let statusText = '';
+
+                            switch (dailyStatus) {
+                                case 'Available':
+                                    statusClass = 'bg-green-700 text-white';
+                                    statusText = 'A'; // Available
+                                    break;
+                                case 'Not Available':
+                                case 'Reserved':
+                                    statusClass = 'bg-red-700 text-white';
+                                    statusText = 'X'; // Not Available / Reserved
+                                    break;
+                                default:
+                                    statusClass = 'bg-gray-700 text-gray-400';
+                                    statusText = '?'; // Unknown
+                                    break;
+                            }
+                            availabilityHtml += `
+                                <div class="day-cell ${statusClass} text-white">
+                                    <span class="day-num">${dayOfMonth}</span>
+                                    <span class="day-status">${statusText}</span>
+                                </div>
+                            `;
+                        }
+                    }
+                    availabilityHtml += '</div>';
+                    // --- End Availability Display Logic ---
+
+                    card.innerHTML = `
+                        <div class="type-badge">${campsite.type ? campsite.type.split(' ')[0].toUpperCase() : 'UNKNOWN'}</div>
+                        <div class="card-header">
+                            <h2>${campsite.name || 'Campsite'}</h2>
+                            <span class="campsite-id">ID: ${campsite.campsite_id || 'N/A'}</span>
+                        </div>
+
+                        ${campsite.preview_image_url ? `<img src="${campsite.preview_image_url}" alt="Campsite Image" class="campsite-image" onerror="this.onerror=null;this.src='https://placehold.co/700x140/2d3748/a0aec0?text=Image+Not+Available';">` : `<img src="https://placehold.co/700x140/2d3748/a0aec0?text=Image+Not+Available" alt="Placeholder Image" class="campsite-image">`}
+                        
+                        <div class="card-meta">
+                            <p><strong>Status:</strong> <span class="status-indicator ${campsite.campsite_status === 'Open' ? 'status-open' : 'status-closed'}">${campsite.campsite_status || 'N/A'}</span></p>
+                            <p class="rating-display">
+                                ${getStarRating(campsite.average_rating)} 
+                                <strong>${campsite.average_rating ? campsite.average_rating.toFixed(1) : 'N/A'}</strong> (${campsite.number_of_ratings || 0})
+                            </p>
+                        </div>
+
+                        <div class="stats-section">
+                            <div class="stats-item">⚡️ <strong>Electric:</strong> ${electricHookup}</div>
+                            <div class="stats-item">💧 <strong>Water:</strong> ${waterHookup}</div>
+                            <div class="stats-item">📏 <strong>Site Length:</strong> ${siteLength} ft</div>
+                            <div class="stats-item">🚗 <strong>Max Vehicle:</strong> ${maxVehicleLength} ft</div>
+                            <div class="stats-item full-width">🛣️ <strong>Driveway:</strong> ${drivewaySurface} (${drivewayEntry})</div>
+                        </div>
+
+                        ${amenities.length > 0 ? `
+                            <div class="abilities-section">
+                                <h3>Features:</h3>
+                                <ul>
+                                    ${amenities.map(amenity => `<li>${amenity}</li>`).join('')}
+                                </ul>
+                            </div>
+                        ` : ''}
+
+                        <p class="checkin-checkout">
+                            <span><strong>Check-in:</strong> ${checkinTime}</span>
+                            <span><strong>Check-out:</strong> ${checkoutTime}</span>
+                        </p>
+                        <p class="text-sm text-gray-400"><strong>Reservable:</strong> ${campsite.reservable ? 'Yes' : 'No'}</p>
+                        
+                        ${availabilityHtml}
+                    `;
+
+                    if (isGroupSite(campsite)) {
+                        spGroupSitesDisplay.appendChild(card);
+                        spGroupSitesFound = true;
+                    } else {
+                        otherCampsitesDisplay.appendChild(card);
+                        otherCampsitesFound = true;
+                    }
+                });
+
+                // Populate global notices after processing all campsites
+                if (uniqueNotices.size > 0) {
+                    uniqueNotices.forEach(noticeText => {
+                        const li = document.createElement('li');
+                        li.textContent = noticeText;
+                        noticesList.appendChild(li);
+                    });
+                    globalNoticesDiv.classList.remove('hidden'); // Show the global notices section
+                } else {
+                    globalNoticesDiv.classList.add('hidden'); // Hide if no notices
+                }
+
+                // Display messages if no campsites found in a category
+                if (!spGroupSitesFound) {
+                    spGroupSitesDisplay.innerHTML = '<p class="text-gray-600 w-full text-center">No SP/Group sites found matching filters.</p>';
+                }
+                if (!otherCampsitesFound) {
+                    otherCampsitesDisplay.innerHTML = '<p class="text-gray-600 w-full text-center">No other campsites found matching filters.</p>';
+                }
+
+            } else {
+                // If no campsites are returned at all after filtering
+                spGroupSitesDisplay.innerHTML = `
+                    <div class="message-box info w-full">
+                        <p>No campsites found matching the current filters.</p>
+                    </div>
+                `;
+                otherCampsitesDisplay.innerHTML = ''; // Clear any loading message from other section
+                globalNoticesDiv.classList.add('hidden'); // Ensure notices are hidden if no data
+            }
+        }
+
+        // Event Listeners for filters
+        campgroundIdInput.addEventListener('change', handleApiParamsChange);
+        startDateInput.addEventListener('change', handleApiParamsChange);
+        typeFilter.addEventListener('change', applyFilters);
+        statusFilter.addEventListener('change', applyFilters);
+        waterfrontFilter.addEventListener('change', applyFilters);
+        daysOfWeekFilter.addEventListener('change', applyFilters); // New listener for days of week filter
+        resetFiltersButton.addEventListener('click', resetFilters);
+
+        /**
+         * Handles changes in campground ID or start date input fields.
+         * Triggers a re-fetch of data and then re-applies filters.
+         */
+        async function handleApiParamsChange() {
+            currentCampgroundId = campgroundIdInput.value;
+            // Ensure start date is always the 1st of the selected month
+            const selectedDate = new Date(startDateInput.value);
+            currentStartDate = new Date(selectedDate.getFullYear(), selectedDate.getMonth(), 1);
+
+            // Fetch and display initial data
+            const data = await fetchData(currentCampgroundId, currentStartDate);
+            if (data && data.campsites) {
+                originalCampsites = data.campsites; // Store the original data
+                populateTypeFilter(originalCampsites); // Populate type filter based on new data
+                applyFilters(); // Apply initial filters (which means display all initially)
+            } else {
+                // If data fetch failed, ensure both sections show no data message
+                spGroupSitesDisplay.innerHTML = '<p class="text-gray-600 w-full text-center">Failed to load data.</p>';
+                otherCampsitesDisplay.innerHTML = '<p class="text-gray-600 w-full text-center">Failed to load data.</p>';
+                globalNoticesDiv.classList.add('hidden');
+            }
+        }
+
+        // Initial load logic
+        window.onload = async function() {
+            // Set default values for inputs on load
+            campgroundIdInput.value = currentCampgroundId;
+            // Format currentStartDate to YYYY-MM for the month input
+            startDateInput.value = `${currentStartDate.getFullYear()}-${(currentStartDate.getMonth() + 1).toString().padStart(2, '0')}`;
+
+            await handleApiParamsChange(); // Trigger initial data fetch and display
+        };
+    </script>
+</body>
+</html>
