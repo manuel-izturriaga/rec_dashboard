@@ -129,8 +129,11 @@ function generateCalendarGrid(startDate, availability, selectedDays) {
  * @returns {HTMLElement} The campsite card element.
  */
 export function createCampsiteCard(campsite, currentStartDate, selectedDays = [], index = -1) {
-    const card = document.createElement('div');
+    const card = document.createElement('a');
     card.classList.add('campsite-card');
+    card.href = `https://www.recreation.gov/camping/campsites/${campsite.campsite_id}`;
+    card.target = '_blank';
+    card.rel = 'noopener noreferrer';
 
     // Extract common attributes using the helper function
     const electricHookup = getAttributeValue(campsite.attributes, 'Electric Hookup');

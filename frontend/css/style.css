@@ -431,3 +431,8 @@ h1 {
     border-color: #fc8181;
     color: #fed7d7;
 }
+/* Reset anchor tag styles for campsite cards */
+a.campsite-card, a.campsite-card:hover {
+    text-decoration: none;
+    color: inherit;
+}
