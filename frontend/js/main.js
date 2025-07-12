@@ -18,7 +18,6 @@ const applyDaysFilterButton = document.getElementById('apply-days-filter');
 let originalCampsites = [];
 let currentCampgroundId = '232702'; // Default campground ID
 let currentStartDate = new Date(); // Default to current month
-currentStartDate.setMonth(currentStartDate.getMonth() + 1); // Set to first day of NEXT month
 currentStartDate.setDate(1); // Set to first day of the month
 
 /**
@@ -172,7 +171,6 @@ function resetFilters() {
     currentCampgroundId = '232702';
     applyDaysFilterButton.disabled = true; // Add this line
     currentStartDate = new Date();
-    currentStartDate.setMonth(currentStartDate.getMonth() + 1); // Set to first day of NEXT month
     currentStartDate.setDate(1);
     startDateInput.value = `${currentStartDate.getFullYear()}-${(currentStartDate.getMonth() + 1).toString().padStart(2, '0')}`;
 
