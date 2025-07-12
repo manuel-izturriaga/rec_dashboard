@@ -71,7 +71,7 @@ function generateCalendarGrid(startDate, availability, selectedDays) {
 
         if (selectedDays.length === 0 || selectedDays.includes(currentDate.getDay())) {
             const isoDate = new Date(Date.UTC(year, month, i)).toISOString().split('.')[0] + 'Z';
-            const dailyStatus = availability && availability[isoDate] ? availability[isoisoDate] : 'Unknown';
+            const dailyStatus = availability && availability[isoDate] ? availability[isoDate] : 'Unknown';
 
             let statusClass = '';
             let statusText = '';
