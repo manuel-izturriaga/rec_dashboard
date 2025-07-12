@@ -39,13 +39,19 @@ function isGroupSite(campsite) {
            reserveType.includes('GROUP');
 }
 
-function generateCalendarGrid(startDate, availability, selectedDays) {
+function generateCalendarGrid(startDate, availability, selectedDays, isCurrentWeek) {
     let html = '<div class="daily-availability">';
     const year = startDate.getFullYear();
     const month = startDate.getMonth();
     const daysInMonth = new Date(year, month + 1, 0).getDate();
     const today = new Date();
     today.setHours(0, 0, 0, 0); // Normalize today to midnight
+
+    const firstDayOfWeek = new Date(today);
+    firstDayOfWeek.setDate(today.getDate() - today.getDay());
+    const lastDayOfWeek = new Date(firstDayOfWeek);
+    lastDayOfWeek.setDate(firstDayOfWeek.getDate() + 6);
+
 
     // Add headers for days of the week
     const dayHeaders = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
@@ -68,6 +74,16 @@ function generateCalendarGrid(startDate, availability, selectedDays) {
         const currentDate = new Date(year, month, i);
         const dayOfWeek = (currentDate.getDay() === 0) ? 6 : currentDate.getDay() - 1; // Monday=0
         const isPastDay = currentDate < today;
+
+        let dayClass = '';
+        if (isCurrentWeek) {
+            if (currentDate >= firstDayOfWeek && currentDate <= lastDayOfWeek) {
+                dayClass = 'current-week-day';
+            } else {
+                dayClass = 'other-week-day';
+            }
+        }
+
 
         if (selectedDays.length === 0 || selectedDays.includes(currentDate.getDay())) {
             const isoDate = new Date(Date.UTC(year, month, i)).toISOString().split('.')[0] + 'Z';
@@ -95,13 +111,13 @@ function generateCalendarGrid(startDate, availability, selectedDays) {
             const pastDayClass = isPastDay ? 'past-day' : '';
 
             html += `
-                <div class="day-cell ${statusClass} ${pastDayClass}" title="${dailyStatus}">
+                <div class="day-cell ${statusClass} ${pastDayClass} ${dayClass}" title="${dailyStatus}">
                     <span class="day-num">${i}</span>
                     <span class="day-status">${statusText}</span>
                 </div>`;
         } else {
             // If the day is filtered out, show it as an empty cell
-            html += `<div class="day-cell empty-day" title="Filtered out"><span class="day-num">${i}</span></div>`;
+            html += `<div class="day-cell empty-day ${dayClass}" title="Filtered out"><span class="day-num">${i}</span></div>`;
         }
     }
 
@@ -126,7 +142,7 @@ function generateCalendarGrid(startDate, availability, selectedDays) {
  * @param {Array} selectedDays - Array of numbers representing selected days of the week (0-6).
  * @returns {HTMLElement} The campsite card element.
  */
-export function createCampsiteCard(campsite, currentStartDate, selectedDays = [], index = -1) {
+export function createCampsiteCard(campsite, currentStartDate, selectedDays = [], isCurrentWeek, index = -1) {
     const card = document.createElement('a');
     card.classList.add('campsite-card');
     card.href = `https://www.recreation.gov/camping/campsites/${campsite.campsite_id}`;
@@ -156,7 +172,7 @@ export function createCampsiteCard(campsite, currentStartDate, selectedDays = []
     if (accessible === 'Yes') amenities.push('Accessible');
 
     // --- Availability Display Logic ---
-    const availabilityHtml = generateCalendarGrid(currentStartDate, campsite.availability, selectedDays);
+    const availabilityHtml = generateCalendarGrid(currentStartDate, campsite.availability, selectedDays, isCurrentWeek);
     // --- End Availability Display Logic ---
 
     card.innerHTML = `
@@ -213,6 +229,7 @@ export function createCampsiteCard(campsite, currentStartDate, selectedDays = []
 export function displayCampsites(campsitesToDisplay, currentStartDate, selectedDays = []) {
     const spGroupSitesDisplay = document.getElementById('sp-group-sites-display');
     const otherCampsitesDisplay = document.getElementById('other-campsites-display');
+    const isCurrentWeek = document.getElementById('current-week-filter').checked;
     const noticesList = document.getElementById('notices-list');
     const globalNoticesDiv = document.getElementById('global-notices');
     const SEWER_NOTICE = "Please note that there are no sewer hook ups at the campground.";
@@ -237,7 +254,7 @@ export function displayCampsites(campsitesToDisplay, currentStartDate, selectedD
                 });
             }
 
-            const card = createCampsiteCard(campsite, currentStartDate, selectedDays, index);
+            const card = createCampsiteCard(campsite, currentStartDate, selectedDays, isCurrentWeek, index);
 
             if (isGroupSite(campsite)) {
                 spGroupSitesDisplay.appendChild(card);
