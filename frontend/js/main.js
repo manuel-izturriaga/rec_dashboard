@@ -7,6 +7,7 @@ const startDateInput = document.getElementById('start-date-input');
 const typeFilter = document.getElementById('type-filter');
 const statusFilter = document.getElementById('status-filter');
 const waterfrontFilter = document.getElementById('waterfront-filter');
+const currentWeekFilter = document.getElementById('current-week-filter');
 const daysOfWeekFilter = document.getElementById('days-of-week-filter');
 const resetFiltersButton = document.getElementById('reset-filters');
 const spGroupSitesDisplay = document.getElementById('sp-group-sites-display');
@@ -141,10 +142,31 @@ function applyFilters() {
     const selectedType = typeFilter.value;
     const selectedStatus = statusFilter.value;
     const isWaterfrontChecked = waterfrontFilter.checked;
+    const isCurrentWeekChecked = currentWeekFilter.checked;
     // Get selected day numbers from the multi-select (0 for Sun, 1 for Mon, etc.)
     const selectedDays = Array.from(daysOfWeekFilter.querySelectorAll('.day-box.selected')).map(box => parseInt(box.dataset.day, 10));
 
     const filteredCampsites = originalCampsites.filter(campsite => {
+        // Current week filter
+        if (isCurrentWeekChecked) {
+            const today = new Date();
+            const currentDay = today.getDay(); // 0 = Sunday, 1 = Monday, etc.
+            const firstDayOfWeek = new Date(today.setDate(today.getDate() - currentDay));
+            const lastDayOfWeek = new Date(firstDayOfWeek);
+            lastDayOfWeek.setDate(lastDayOfWeek.getDate() + 6);
+
+            let availableInCurrentWeek = false;
+            for (const dateStr in campsite.availability) {
+                const availableDate = new Date(dateStr);
+                if (availableDate >= firstDayOfWeek && availableDate <= lastDayOfWeek && campsite.availability[dateStr] === 'Available') {
+                    availableInCurrentWeek = true;
+                    break;
+                }
+            }
+            if (!availableInCurrentWeek) {
+                return false;
+            }
+        }
         // day of week filter
         if (selectedDays.length === 1) {
             if (!hasDayAvailability(campsite, selectedDays[0], currentStartDate)) {
@@ -199,6 +221,7 @@ function resetFilters() {
     typeFilter.value = 'all';
     statusFilter.value = 'all';
     waterfrontFilter.checked = false;
+    currentWeekFilter.checked = false;
     // Clear all selected options in the days of week filter
     Array.from(daysOfWeekFilter.querySelectorAll('.day-box')).forEach(box => {
         box.classList.remove('selected');
@@ -245,6 +268,7 @@ startDateInput.addEventListener('change', handleApiParamsChange);
 typeFilter.addEventListener('change', applyFilters);
 statusFilter.addEventListener('change', applyFilters);
 waterfrontFilter.addEventListener('change', applyFilters);
+currentWeekFilter.addEventListener('change', applyFilters);
 // Click-to-select for days of the week, with shift-click for range selection
 let lastClickedDay = -1;
 
