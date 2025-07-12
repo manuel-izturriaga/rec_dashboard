@@ -46,6 +46,39 @@ function populateTypeFilter(campsites) {
 }
 
 /**
+ * Checks if a campsite has availability on a specific day of the week within a given month.
+ * @param {object} campsite - The campsite object.
+ * @param {number} selectedDay - The selected day of the week (0-6, where 0 is Sunday).
+ * @param {Date} startDate - The start date for the search month.
+ * @returns {boolean} - True if availability is found for that day, false otherwise.
+ */
+function hasDayAvailability(campsite, selectedDay, startDate) {
+    const availability = campsite.availability;
+
+    if (!availability || Object.keys(availability).length === 0) {
+        return false;
+    }
+
+    const year = startDate.getFullYear();
+    const month = startDate.getMonth();
+    const daysInMonth = new Date(year, month + 1, 0).getDate();
+
+    for (let day = 1; day <= daysInMonth; day++) {
+        const currentDate = new Date(Date.UTC(year, month, day));
+        const dayOfWeek = currentDate.getUTCDay();
+
+        if (dayOfWeek === selectedDay) {
+            const isoDate = currentDate.toISOString().split('T')[0] + 'T00:00:00Z';
+            if (availability[isoDate] === "Available") {
+                return true;
+            }
+        }
+    }
+
+    return false;
+}
+
+/**
  * Checks if a campsite has consecutive availability for the selected days of the week.
  * @param {object} campsite - The campsite object.
  * @param {number[]} selectedDays - An array of selected day numbers (0-6).
@@ -113,8 +146,12 @@ function applyFilters() {
     const selectedDays = Array.from(daysOfWeekFilter.querySelectorAll('.day-box.selected')).map(box => parseInt(box.dataset.day, 10));
 
     const filteredCampsites = originalCampsites.filter(campsite => {
-        // Consecutive days filter
-        if (selectedDays.length >= 2) {
+        // day of week filter
+        if (selectedDays.length === 1) {
+            if (!hasDayAvailability(campsite, selectedDays[0], currentStartDate)) {
+                return false;
+            }
+        } else if (selectedDays.length >= 2) {
             if (!hasConsecutiveAvailability(campsite, selectedDays, currentStartDate)) {
                 return false;
             }
