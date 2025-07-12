@@ -39,18 +39,13 @@ function isGroupSite(campsite) {
            reserveType.includes('GROUP');
 }
 
-/**
- * Generates the HTML for a 7x5 calendar grid for a given month.
- * @param {Date} startDate - The first day of the month to display.
- * @param {Object} availability - The availability data for the campsite.
- * @param {Array} selectedDays - Array of numbers representing selected days of the week (0-6).
- * @returns {string} The HTML string for the calendar grid.
- */
 function generateCalendarGrid(startDate, availability, selectedDays) {
     let html = '<div class="daily-availability">';
     const year = startDate.getFullYear();
     const month = startDate.getMonth();
     const daysInMonth = new Date(year, month + 1, 0).getDate();
+    const today = new Date();
+    today.setHours(0, 0, 0, 0); // Normalize today to midnight
 
     // Add headers for days of the week
     const dayHeaders = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
@@ -72,10 +67,11 @@ function generateCalendarGrid(startDate, availability, selectedDays) {
     for (let i = 1; i <= daysInMonth; i++) {
         const currentDate = new Date(year, month, i);
         const dayOfWeek = (currentDate.getDay() === 0) ? 6 : currentDate.getDay() - 1; // Monday=0
+        const isPastDay = currentDate < today;
 
         if (selectedDays.length === 0 || selectedDays.includes(currentDate.getDay())) {
             const isoDate = new Date(Date.UTC(year, month, i)).toISOString().split('.')[0] + 'Z';
-            const dailyStatus = availability && availability[isoDate] ? availability[isoDate] : 'Unknown';
+            const dailyStatus = availability && availability[isoDate] ? availability[isoisoDate] : 'Unknown';
 
             let statusClass = '';
             let statusText = '';
@@ -96,8 +92,10 @@ function generateCalendarGrid(startDate, availability, selectedDays) {
                     break;
             }
 
+            const pastDayClass = isPastDay ? 'past-day' : '';
+
             html += `
-                <div class="day-cell ${statusClass}" title="${dailyStatus}">
+                <div class="day-cell ${statusClass} ${pastDayClass}" title="${dailyStatus}">
                     <span class="day-num">${i}</span>
                     <span class="day-status">${statusText}</span>
                 </div>`;

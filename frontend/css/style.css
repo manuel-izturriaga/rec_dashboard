@@ -604,3 +604,7 @@ a.campsite-card, a.campsite-card:hover {
     height: 400px;
     width: 100%;
 }
+
+.daily-availability .day-cell.past-day {
+    opacity: 0.6;
+}
