@@ -3,21 +3,62 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Reservations</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+    <title>Reservations Dashboard</title>
     <link rel="stylesheet" href="css/style.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
-<body>
-    <div class="container mx-auto p-4">
-        <h1 class="text-3xl font-bold mb-6">Reservations</h1>
-        <div class="filter-section mb-4">
-            <label for="month-select" class="mr-2">Select Month:</label>
-            <input type="month" id="month-select">
+<body class="dashboard-body">
+
+    <header class="dashboard-header">
+        <h1>Reservation Dashboard</h1>
+        <p>Overview of camping reservations.</p>
+        <div class="filter-section">
+            <div class="filter-group">
+                <label for="month-select">Select Month:</label>
+                <input type="month" id="month-select" />
+            </div>
+            <div class="filter-group">
+                <label for="state-filter">Filter by Facility State:</label>
+                <select id="state-filter">
+                    <option value="All">All States</option>
+                    <!-- Options will be populated by JavaScript -->
+                </select>
+            </div>
         </div>
-        <div id="reservations-summary">
-            <!-- Aggregated reservation data will be displayed here -->
+    </header>
+
+    <main class="dashboard-main">
+        <!-- Summary Cards -->
+        <div class="dashboard-card" id="total-reservations-card">
+            <h2>Total Reservations</h2>
+            <p class="summary-value" id="total-reservations">0</p>
         </div>
-    </div>
-    <script src="js/reservations.js" type="module"></script>
+        <div class="dashboard-card" id="total-revenue-card">
+            <h2>Total Revenue</h2>
+            <p class="summary-value" id="total-revenue">$0</p>
+        </div>
+
+        <!-- Chart Containers -->
+        <div class="dashboard-card" id="reservations-by-date-card">
+            <h2>Reservations by Start Date</h2>
+            <div class="chart-container">
+                <canvas id="reservationsByDateChart"></canvas>
+            </div>
+        </div>
+        <div class="dashboard-card" id="nights-distribution-card">
+            <h2>Nights Distribution</h2>
+            <div class="chart-container">
+                <canvas id="nightsDistributionChart"></canvas>
+            </div>
+        </div>
+        <div class="dashboard-card full-width" id="parks-distribution-card">
+            <h2>Distribution Across Parks</h2>
+            <div class="chart-container">
+                <canvas id="reservationsByParkChart"></canvas>
+            </div>
+        </div>
+    </main>
+
+    <script src="js/reservations.js"></script>
 </body>
 </html>
