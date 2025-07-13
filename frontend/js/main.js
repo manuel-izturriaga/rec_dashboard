@@ -5,6 +5,7 @@ import { displayCampsites } from './ui.js';
 const campgroundSelect = document.getElementById('campground-select');
 const startDateInput = document.getElementById('start-date-input');
 const typeFilter = document.getElementById('type-filter');
+const drivewayFilter = document.getElementById('driveway-filter');
 const statusFilter = document.getElementById('status-filter');
 const waterfrontFilter = document.getElementById('waterfront-filter');
 const currentWeekFilter = document.getElementById('current-week-filter');
@@ -42,6 +43,30 @@ function populateTypeFilter(campsites) {
         option.value = type;
         option.textContent = type;
         typeFilter.appendChild(option);
+    });
+}
+
+/**
+ * Populates the Driveway filter dropdown with unique driveway types.
+ * @param {Array} campsites - The array of campsite objects.
+ */
+function populateDrivewayFilter(campsites) {
+    const uniqueDriveways = new Set();
+    campsites.forEach(campsite => {
+        if (campsite.driveway) {
+            uniqueDriveways.add(campsite.driveway);
+        }
+    });
+
+    // Clear existing options except "All Driveways"
+    drivewayFilter.innerHTML = '<option value="all">All Driveways</option>';
+
+    // Add unique driveways
+    Array.from(uniqueDriveways).sort().forEach(driveway => {
+        const option = document.createElement('option');
+        option.value = driveway;
+        option.textContent = driveway;
+        drivewayFilter.appendChild(option);
     });
 }
 
@@ -140,6 +165,7 @@ function hasConsecutiveAvailability(campsite, selectedDays, startDate) {
  */
 function applyFilters() {
     const selectedType = typeFilter.value;
+    const selectedDriveway = drivewayFilter.value;
     const selectedStatus = statusFilter.value;
     const isWaterfrontChecked = waterfrontFilter.checked;
     const isCurrentWeekChecked = currentWeekFilter.checked;
@@ -198,6 +224,11 @@ function applyFilters() {
             return false;
         }
 
+        // Driveway filter
+        if (selectedDriveway !== 'all' && campsite.driveway !== selectedDriveway) {
+            return false;
+        }
+
         // Status filter
         if (selectedStatus !== 'all' && campsite.campsite_status !== selectedStatus) {
             return false;
@@ -234,6 +265,7 @@ function applyFilters() {
  */
 function resetFilters() {
     typeFilter.value = 'all';
+    drivewayFilter.value = 'all';
     statusFilter.value = 'all';
     waterfrontFilter.checked = false;
     currentWeekFilter.checked = false;
@@ -268,6 +300,7 @@ async function handleApiParamsChange() {
     if (data && data.campsites) {
         originalCampsites = data.campsites; // Store the original data
         populateTypeFilter(originalCampsites); // Populate type filter based on new data
+        populateDrivewayFilter(originalCampsites); // Populate driveway filter
         applyFilters(); // Apply initial filters (which means display all initially)
     } else {
         // If data fetch failed, ensure both sections show no data message
