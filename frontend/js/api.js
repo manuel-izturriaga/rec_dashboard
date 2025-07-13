@@ -38,6 +38,7 @@ export async function fetchCombinedData(campgroundId, startDate) {
         const combinedCampsites = searchData.campsites.map(campsite => {
             // Link availability by campsite_id
             const siteAvailability = availabilityData[campsite.campsite_id]?.availabilities || {};
+
             return { ...campsite, availability: siteAvailability };
         });
 

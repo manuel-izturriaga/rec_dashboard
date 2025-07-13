@@ -147,34 +147,49 @@ function applyFilters() {
     const selectedDays = Array.from(daysOfWeekFilter.querySelectorAll('.day-box.selected')).map(box => parseInt(box.dataset.day, 10));
 
     const filteredCampsites = originalCampsites.filter(campsite => {
-        // Current week filter
+        // Combined availability filter for current week and selected days
         if (isCurrentWeekChecked) {
             const today = new Date();
-            const currentDay = today.getDay(); // 0 = Sunday, 1 = Monday, etc.
-            const firstDayOfWeek = new Date(today.setDate(today.getDate() - currentDay));
-            const lastDayOfWeek = new Date(firstDayOfWeek);
-            lastDayOfWeek.setDate(lastDayOfWeek.getDate() + 6);
+            const todayUTC = new Date(Date.UTC(today.getFullYear(), today.getMonth(), today.getDate()));
 
-            let availableInCurrentWeek = false;
+            // Consistent Monday-first week calculation in UTC
+            const day = todayUTC.getUTCDay(); // 0=Sun, 1=Mon, ..., 6=Sat
+            const offset = (day === 0) ? 6 : day - 1;
+            const firstDayOfWeek = new Date(todayUTC);
+            firstDayOfWeek.setUTCDate(todayUTC.getUTCDate() - offset);
+            const lastDayOfWeek = new Date(firstDayOfWeek);
+            lastDayOfWeek.setUTCDate(firstDayOfWeek.getUTCDate() + 6);
+
+            let availableInWeek = false;
             for (const dateStr in campsite.availability) {
-                const availableDate = new Date(dateStr);
+                const availableDate = new Date(dateStr); // dateStr is already UTC
                 if (availableDate >= firstDayOfWeek && availableDate <= lastDayOfWeek && campsite.availability[dateStr] === 'Available') {
-                    availableInCurrentWeek = true;
-                    break;
+                    // If days are selected, check if this available day is one of them
+                    if (selectedDays.length > 0) {
+                        if (selectedDays.includes(availableDate.getUTCDay())) {
+                            availableInWeek = true;
+                            break; // Found a match, no need to check further
+                        }
+                    } else {
+                        // If no days are selected, any availability in the week is a match
+                        availableInWeek = true;
+                        break;
+                    }
                 }
             }
-            if (!availableInCurrentWeek) {
-                return false;
+            if (!availableInWeek) {
+                return false; // Filter out if no matching availability in the current week
             }
-        }
-        // day of week filter
-        if (selectedDays.length === 1) {
-            if (!hasDayAvailability(campsite, selectedDays[0], currentStartDate)) {
-                return false;
-            }
-        } else if (selectedDays.length >= 2) {
-            if (!hasConsecutiveAvailability(campsite, selectedDays, currentStartDate)) {
-                return false;
+        } else {
+            // If current week is not checked, use the original month-based day filter
+            if (selectedDays.length === 1) {
+                if (!hasDayAvailability(campsite, selectedDays[0], currentStartDate)) {
+                    return false;
+                }
+            } else if (selectedDays.length >= 2) {
+                if (!hasConsecutiveAvailability(campsite, selectedDays, currentStartDate)) {
+                    return false;
+                }
             }
         }
 

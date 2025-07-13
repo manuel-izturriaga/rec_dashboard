@@ -44,13 +44,17 @@ function generateCalendarGrid(startDate, availability, selectedDays, isCurrentWe
     const year = startDate.getFullYear();
     const month = startDate.getMonth();
     const daysInMonth = new Date(year, month + 1, 0).getDate();
+    
     const today = new Date();
-    today.setHours(0, 0, 0, 0); // Normalize today to midnight
+    const todayUTC = new Date(Date.UTC(today.getFullYear(), today.getMonth(), today.getDate()));
 
-    const firstDayOfWeek = new Date(today);
-    firstDayOfWeek.setDate(today.getDate() - today.getDay());
+    // Consistent Monday-first week calculation in UTC
+    const day = todayUTC.getUTCDay(); // 0=Sun, 1=Mon, ..., 6=Sat
+    const offset = (day === 0) ? 6 : day - 1;
+    const firstDayOfWeek = new Date(todayUTC);
+    firstDayOfWeek.setUTCDate(todayUTC.getUTCDate() - offset);
     const lastDayOfWeek = new Date(firstDayOfWeek);
-    lastDayOfWeek.setDate(firstDayOfWeek.getDate() + 6);
+    lastDayOfWeek.setUTCDate(firstDayOfWeek.getUTCDate() + 6);
 
 
     // Add headers for days of the week
@@ -60,7 +64,7 @@ function generateCalendarGrid(startDate, availability, selectedDays, isCurrentWe
     });
 
     // Calculate the starting day of the week (0 for Sunday, 6 for Saturday)
-    const firstDayOfMonth = new Date(year, month, 1).getDay();
+    const firstDayOfMonth = new Date(Date.UTC(year, month, 1)).getUTCDay();
     // Adjust to make Monday the first day of the week (Monday=0, Sunday=6)
     const startOffset = (firstDayOfMonth === 0) ? 6 : firstDayOfMonth - 1;
 
@@ -71,26 +75,27 @@ function generateCalendarGrid(startDate, availability, selectedDays, isCurrentWe
 
     // Add cells for each day of the month
     for (let i = 1; i <= daysInMonth; i++) {
-        const currentDate = new Date(year, month, i);
-        const dayOfWeek = (currentDate.getDay() === 0) ? 6 : currentDate.getDay() - 1; // Monday=0
-        const isPastDay = currentDate < today;
+        const currentDate = new Date(Date.UTC(year, month, i));
+        const dayOfWeek = (currentDate.getUTCDay() === 0) ? 6 : currentDate.getUTCDay() - 1; // Monday=0
+        const isPastDay = currentDate < todayUTC;
 
         let dayClass = '';
         if (isCurrentWeek) {
             if (currentDate >= firstDayOfWeek && currentDate <= lastDayOfWeek) {
-                dayClass = 'current-week-day';
+               // dayClass = 'current-week-day';
             } else {
                 dayClass = 'other-week-day';
             }
         }
 
 
-        if (selectedDays.length === 0 || selectedDays.includes(currentDate.getDay())) {
-            const isoDate = new Date(Date.UTC(year, month, i)).toISOString().split('.')[0] + 'Z';
+        if (selectedDays.length === 0 || selectedDays.includes(currentDate.getUTCDay())) {
+            const isoDate = currentDate.toISOString().split('T')[0] + 'T00:00:00Z';
             const dailyStatus = availability && availability[isoDate] ? availability[isoDate] : 'Unknown';
 
             let statusClass = '';
             let statusText = '';
+
 
             switch (dailyStatus) {
                 case 'Available':
