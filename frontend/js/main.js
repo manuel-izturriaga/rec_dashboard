@@ -1,9 +1,9 @@
 import { fetchCombinedData } from './api.js';
-import { displayCampsites } from './ui.js';
+import { displayCampsites, createInteractiveCalendar, createMonthSelectorView } from './ui.js';
 
 // DOM elements
 const campgroundSelect = document.getElementById('campground-select');
-const startDateInput = document.getElementById('start-date-input');
+const dateRangeDisplay = document.getElementById('date-range-display');
 const typeFilter = document.getElementById('type-filter');
 const drivewayFilter = document.getElementById('driveway-filter');
 const statusFilter = document.getElementById('status-filter');
@@ -15,12 +15,110 @@ const spGroupSitesDisplay = document.getElementById('sp-group-sites-display');
 const otherCampsitesDisplay = document.getElementById('other-campsites-display');
 const globalNoticesDiv = document.getElementById('global-notices');
 const applyDaysFilterButton = document.getElementById('apply-days-filter');
+const calendarModal = document.getElementById('calendar-modal');
 
 // Global data stores
 let originalCampsites = [];
 let currentCampgroundId = '232702'; // Default campground ID
 let currentStartDate = new Date(); // Default to current month
 currentStartDate.setDate(1); // Set to first day of the month
+
+let selectionStart = null;
+let selectionEnd = null;
+let calendarDate = new Date();
+
+function openCalendarModal() {
+    const inputRect = dateRangeDisplay.getBoundingClientRect();
+    calendarModal.style.left = `${inputRect.left}px`;
+    calendarModal.style.top = `${inputRect.bottom + window.scrollY}px`;
+
+    calendarModal.innerHTML = createInteractiveCalendar(calendarDate, { start: selectionStart, end: selectionEnd });
+    calendarModal.classList.remove('modal-hidden');
+    // Add event listeners for the modal buttons
+    document.getElementById('cancel-calendar-btn').addEventListener('click', closeCalendarModal);
+    document.getElementById('clear-calendar-btn').addEventListener('click', () => {
+        selectionStart = null;
+        selectionEnd = null;
+        openCalendarModal();
+    });
+    document.getElementById('apply-calendar-btn').addEventListener('click', () => {
+        if (selectionStart) {
+            const options = { year: 'numeric', month: 'short', day: 'numeric', timeZone: 'UTC' };
+            let dateStr = selectionStart.toLocaleDateString('en-US', options);
+            if (selectionEnd) {
+                dateStr += ` - ${selectionEnd.toLocaleDateString('en-US', options)}`;
+            }
+            dateRangeDisplay.value = dateStr;
+            applyFilters();
+            closeCalendarModal();
+        }
+    });
+    document.getElementById('prev-month-btn').addEventListener('click', () => {
+        calendarDate.setMonth(calendarDate.getMonth() - 1);
+        openCalendarModal();
+    });
+    document.getElementById('next-month-btn').addEventListener('click', () => {
+        calendarDate.setMonth(calendarDate.getMonth() + 1);
+        openCalendarModal();
+    });
+    document.querySelector('.calendar-grid').addEventListener('click', handleDayClick);
+    document.getElementById('calendar-month-year').addEventListener('click', showMonthSelector);
+}
+
+function closeCalendarModal() {
+    calendarModal.classList.add('modal-hidden');
+    calendarModal.innerHTML = '';
+}
+
+function handleDayClick(e) {
+    const dayElement = e.target.closest('.calendar-day');
+    if (!dayElement || dayElement.classList.contains('empty')) {
+        return; // Clicked on grid gap or empty day
+    }
+
+    const clickedDateStr = dayElement.dataset.date;
+    const clickedDate = new Date(clickedDateStr + 'T00:00:00Z');
+
+    if (!selectionStart || (selectionStart && selectionEnd)) {
+        // Start a new selection
+        selectionStart = clickedDate;
+        selectionEnd = null;
+    } else {
+        // Complete the selection
+        if (clickedDate < selectionStart) {
+            selectionEnd = selectionStart;
+            selectionStart = clickedDate;
+        } else {
+            selectionEnd = clickedDate;
+        }
+    }
+
+    // Re-render the calendar to show the selection
+    openCalendarModal();
+}
+
+function showMonthSelector() {
+    calendarModal.innerHTML = createMonthSelectorView(calendarDate.getFullYear());
+    document.querySelector('.month-selector-grid').addEventListener('click', handleMonthClick);
+    document.getElementById('prev-year-btn').addEventListener('click', () => {
+        calendarDate.setFullYear(calendarDate.getFullYear() - 1);
+        showMonthSelector();
+    });
+    document.getElementById('next-year-btn').addEventListener('click', () => {
+        calendarDate.setFullYear(calendarDate.getFullYear() + 1);
+        showMonthSelector();
+    });
+}
+
+function handleMonthClick(e) {
+    const monthElement = e.target.closest('.month-selector-month');
+    if (!monthElement) {
+        return;
+    }
+    const month = parseInt(monthElement.dataset.month, 10);
+    calendarDate.setMonth(month);
+    openCalendarModal();
+}
 
 /**
  * Populates the Type filter dropdown with unique campsite types.
@@ -164,6 +262,28 @@ function hasConsecutiveAvailability(campsite, selectedDays, startDate) {
 }
 
 /**
+ * Checks if a campsite has availability for a specified date range.
+ * @param {object} campsite - The campsite object.
+ * @param {string} startDateStr - The start date of the range (YYYY-MM-DD).
+ * @param {string} endDateStr - The end date of the range (YYYY-MM-DD).
+ * @returns {boolean} - True if the campsite is available for the entire range, false otherwise.
+ */
+function hasAvailabilityForRange(campsite, startDateStr, endDateStr) {
+    const start = new Date(startDateStr + 'T00:00:00Z');
+    const end = new Date(endDateStr + 'T00:00:00Z');
+    let currentDate = new Date(start);
+
+    while (currentDate <= end) {
+        const isoDate = currentDate.toISOString().split('T')[0] + 'T00:00:00Z';
+        if (campsite.availability[isoDate] !== 'Available') {
+            return false;
+        }
+        currentDate.setUTCDate(currentDate.getUTCDate() + 1);
+    }
+    return true;
+}
+
+/**
  * Applies filters to the original campsite data and updates the display.
  */
 function applyFilters() {
@@ -174,6 +294,10 @@ function applyFilters() {
     const isCurrentWeekChecked = currentWeekFilter.checked;
     // Get selected day numbers from the multi-select (0 for Sun, 1 for Mon, etc.)
     const selectedDays = Array.from(daysOfWeekFilter.querySelectorAll('.day-box.selected')).map(box => parseInt(box.dataset.day, 10));
+
+    // Date range values will now come from a state variable, not inputs.
+    const startDate = selectionStart ? selectionStart.toISOString().split('T')[0] : '';
+    const endDate = selectionEnd ? selectionEnd.toISOString().split('T')[0] : '';
 
     const filteredCampsites = originalCampsites.filter(campsite => {
         // Combined availability filter for current week and selected days
@@ -219,6 +343,13 @@ function applyFilters() {
                 if (!hasConsecutiveAvailability(campsite, selectedDays, currentStartDate)) {
                     return false;
                 }
+            }
+        }
+
+        // Date Range Filter
+        if (startDate && endDate) {
+            if (!hasAvailabilityForRange(campsite, startDate, endDate)) {
+                return false;
             }
         }
 
@@ -283,9 +414,11 @@ function resetFilters() {
     campgroundSelect.value = '232702';
     currentCampgroundId = '232702';
     applyDaysFilterButton.disabled = true; // Add this line
+    dateRangeDisplay.value = '';
+    selectionStart = null;
+    selectionEnd = null;
     currentStartDate = new Date();
     currentStartDate.setDate(1);
-    startDateInput.value = `${currentStartDate.getFullYear()}-${(currentStartDate.getMonth() + 1).toString().padStart(2, '0')}`;
 
     handleApiParamsChange(); // Re-fetch data with reset parameters
 }
@@ -298,8 +431,8 @@ async function handleApiParamsChange() {
     currentCampgroundId = campgroundSelect.value;
     // Ensure start date is always the 1st of the selected month, avoiding timezone issues.
     // By adding a time, we prevent JS from defaulting to UTC and shifting the date.
-    const selectedDate = new Date(`${startDateInput.value}-01T12:00:00`);
-    currentStartDate = new Date(selectedDate.getFullYear(), selectedDate.getMonth(), 1);
+    // This logic is now obsolete. The `currentStartDate` will be managed by the new calendar modal state.
+    // For now, the initial value set at the top of the file will be used for the first load.
 
     // Fetch and display initial data
     const data = await fetchCombinedData(currentCampgroundId, currentStartDate);
@@ -318,7 +451,7 @@ async function handleApiParamsChange() {
 
 // Event Listeners for filters
 campgroundSelect.addEventListener('change', handleApiParamsChange);
-startDateInput.addEventListener('change', handleApiParamsChange);
+// The 'change' event on the old month input is no longer needed.
 typeFilter.addEventListener('change', applyFilters);
 drivewayFilter.addEventListener('change', applyFilters);
 statusFilter.addEventListener('change', applyFilters);
@@ -375,12 +508,16 @@ applyDaysFilterButton.addEventListener('click', () => {
 });
 resetFiltersButton.addEventListener('click', resetFilters);
 
+// All old date range picker logic is removed.
+// This will be replaced by the new calendar modal logic in Phase 2.
+
 // Initial load logic
 window.onload = async function() {
     // Set default values for inputs on load
     campgroundSelect.value = currentCampgroundId;
     // Format currentStartDate to YYYY-MM for the month input
-    startDateInput.value = `${currentStartDate.getFullYear()}-${(currentStartDate.getMonth() + 1).toString().padStart(2, '0')}`;
+    // The date range display is now a placeholder, it will be updated by the modal
+    dateRangeDisplay.placeholder = "Select a date range";
 
     await handleApiParamsChange(); // Trigger initial data fetch and display
 };
@@ -422,3 +559,4 @@ window.addEventListener('resize', () => {
         cardsWrapper.style.paddingTop = `${filterHeight}px`;
     }
 });
+dateRangeDisplay.addEventListener('click', openCalendarModal);

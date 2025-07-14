@@ -147,6 +147,93 @@ function generateCalendarGrid(startDate, availability, selectedDays, isCurrentWe
  * @param {Array} selectedDays - Array of numbers representing selected days of the week (0-6).
  * @returns {HTMLElement} The campsite card element.
  */
+export function createInteractiveCalendar(date, selection = {}) {
+    const year = date.getFullYear();
+    const month = date.getMonth();
+    const monthName = date.toLocaleString('default', { month: 'long' });
+
+    let html = `
+        <div class="calendar-container">
+            <div class="calendar-header">
+                <button id="prev-month-btn"><</button>
+                <h3 id="calendar-month-year">${monthName} ${year}</h3>
+                <button id="next-month-btn">></button>
+            </div>
+            <div class="calendar-grid">
+                <div class="calendar-day-header">Mon</div>
+                <div class="calendar-day-header">Tue</div>
+                <div class="calendar-day-header">Wed</div>
+                <div class="calendar-day-header">Thu</div>
+                <div class="calendar-day-header">Fri</div>
+                <div class="calendar-day-header">Sat</div>
+                <div class="calendar-day-header">Sun</div>
+    `;
+
+    const firstDayOfMonth = new Date(year, month, 1).getDay();
+    const startOffset = (firstDayOfMonth === 0) ? 6 : firstDayOfMonth - 1; // Monday is 0
+    const daysInMonth = new Date(year, month + 1, 0).getDate();
+
+    for (let i = 0; i < startOffset; i++) {
+        html += '<div class="calendar-day empty"></div>';
+    }
+
+    for (let i = 1; i <= daysInMonth; i++) {
+        const currentDate = new Date(Date.UTC(year, month, i));
+        const dateStr = currentDate.toISOString().split('T')[0];
+        let dayClass = '';
+
+        if (selection.start) {
+            const startDate = new Date(selection.start.getTime());
+            const endDate = selection.end ? new Date(selection.end.getTime()) : null;
+
+            if (currentDate.getTime() === startDate.getTime() && !endDate) {
+                dayClass = 'selected';
+            } else if (endDate && currentDate.getTime() === startDate.getTime()) {
+                dayClass = 'selected range-start';
+            } else if (endDate && currentDate.getTime() === endDate.getTime()) {
+                dayClass = 'selected range-end';
+            } else if (endDate && currentDate > startDate && currentDate < endDate) {
+                dayClass = 'in-range';
+            }
+        }
+
+        html += `<div class="calendar-day ${dayClass}" data-date="${dateStr}">${i}</div>`;
+    }
+
+    html += `
+            </div>
+            <div class="calendar-footer">
+                <button id="cancel-calendar-btn">Cancel</button>
+                <button id="clear-calendar-btn">Clear</button>
+                <button id="apply-calendar-btn" ${!selection.start ? 'disabled' : ''}>Apply</button>
+            </div>
+        </div>
+    `;
+    return html;
+}
+
+export function createMonthSelectorView(year) {
+    let html = `
+        <div class="calendar-container">
+            <div class="calendar-header">
+                <button id="prev-year-btn"><</button>
+                <h3 id="calendar-year">${year}</h3>
+                <button id="next-year-btn">></button>
+            </div>
+            <div class="month-selector-grid">
+    `;
+    const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+    months.forEach((month, index) => {
+        html += `<div class="month-selector-month" data-month="${index}">${month}</div>`;
+    });
+
+    html += `
+            </div>
+        </div>
+    `;
+    return html;
+}
+
 export function createCampsiteCard(campsite, currentStartDate, selectedDays = [], isCurrentWeek, index = -1) {
     const card = document.createElement('a');
     card.classList.add('campsite-card');
