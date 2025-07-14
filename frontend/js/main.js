@@ -53,8 +53,11 @@ function populateTypeFilter(campsites) {
 function populateDrivewayFilter(campsites) {
     const uniqueDriveways = new Set();
     campsites.forEach(campsite => {
-        if (campsite.driveway) {
-            uniqueDriveways.add(campsite.driveway);
+        if (Array.isArray(campsite.attributes)) {
+            const drivewayAttribute = campsite.attributes.find(attr => attr.attribute_name === 'Driveway Entry');
+            if (drivewayAttribute) {
+                uniqueDriveways.add(drivewayAttribute.attribute_value);
+            }
         }
     });
 
@@ -225,8 +228,11 @@ function applyFilters() {
         }
 
         // Driveway filter
-        if (selectedDriveway !== 'all' && campsite.driveway !== selectedDriveway) {
-            return false;
+        if (selectedDriveway !== 'all') {
+            const drivewayAttribute = campsite.attributes.find(attr => attr.attribute_name === 'Driveway Entry');
+            if (!drivewayAttribute || drivewayAttribute.attribute_value !== selectedDriveway) {
+                return false;
+            }
         }
 
         // Status filter
@@ -314,6 +320,7 @@ async function handleApiParamsChange() {
 campgroundSelect.addEventListener('change', handleApiParamsChange);
 startDateInput.addEventListener('change', handleApiParamsChange);
 typeFilter.addEventListener('change', applyFilters);
+drivewayFilter.addEventListener('change', applyFilters);
 statusFilter.addEventListener('change', applyFilters);
 waterfrontFilter.addEventListener('change', applyFilters);
 currentWeekFilter.addEventListener('change', applyFilters);
