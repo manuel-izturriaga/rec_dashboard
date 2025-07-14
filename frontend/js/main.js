@@ -384,3 +384,41 @@ window.onload = async function() {
 
     await handleApiParamsChange(); // Trigger initial data fetch and display
 };
+// Sticky filter section logic
+const filterSection = document.getElementById('filter-section');
+const cardsWrapper = document.querySelector('.cards-wrapper');
+let filterSectionOffsetTop = filterSection.offsetTop;
+
+window.addEventListener('scroll', () => {
+    if (window.scrollY >= filterSectionOffsetTop) {
+        if (!filterSection.classList.contains('sticky')) {
+            const filterHeight = filterSection.offsetHeight;
+            filterSection.classList.add('sticky');
+            cardsWrapper.style.paddingTop = `${filterHeight}px`;
+        }
+    } else {
+        if (filterSection.classList.contains('sticky')) {
+            filterSection.classList.remove('sticky');
+            cardsWrapper.style.paddingTop = '0';
+        }
+    }
+});
+
+// Recalculate offset on window resize
+window.addEventListener('resize', () => {
+    // Temporarily remove sticky to get correct offset
+    const isSticky = filterSection.classList.contains('sticky');
+    if (isSticky) {
+        filterSection.classList.remove('sticky');
+        cardsWrapper.style.paddingTop = '0';
+    }
+    
+    filterSectionOffsetTop = filterSection.offsetTop;
+
+    // Re-apply if it was sticky before
+    if (isSticky) {
+        filterSection.classList.add('sticky');
+        const filterHeight = filterSection.offsetHeight;
+        cardsWrapper.style.paddingTop = `${filterHeight}px`;
+    }
+});
