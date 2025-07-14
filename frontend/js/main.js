@@ -43,9 +43,10 @@ function openCalendarModal() {
     });
     document.getElementById('apply-calendar-btn').addEventListener('click', () => {
         if (selectionStart) {
-            let dateStr = selectionStart.toLocaleDateString();
+            const options = { year: 'numeric', month: 'short', day: 'numeric', timeZone: 'UTC' };
+            let dateStr = selectionStart.toLocaleDateString('en-US', options);
             if (selectionEnd) {
-                dateStr += ` - ${selectionEnd.toLocaleDateString()}`;
+                dateStr += ` - ${selectionEnd.toLocaleDateString('en-US', options)}`;
             }
             dateRangeDisplay.value = dateStr;
             applyFilters();
