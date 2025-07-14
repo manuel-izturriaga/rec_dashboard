@@ -205,7 +205,7 @@ export function createInteractiveCalendar(date, selection = {}) {
             <div class="calendar-footer">
                 <button id="cancel-calendar-btn">Cancel</button>
                 <button id="clear-calendar-btn">Clear</button>
-                <button id="apply-calendar-btn" ${!(selection.start)} ? 'disabled' : ''}>Apply</button>
+                <button id="apply-calendar-btn" ${!selection.start ? 'disabled' : ''}>Apply</button>
             </div>
         </div>
     `;
