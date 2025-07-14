@@ -33,7 +33,7 @@
             </div>
             <div class="filter-group">
                 <label for="start-date-input">Month:</label>
-                <input type="month" id="start-date-input">
+                <input type="text" id="date-range-display" readonly placeholder="Select a date range">
             </div>
             <div class="filter-group">
                 <label for="type-filter">Campsite Type:</label>
@@ -95,5 +95,6 @@
     </div>
 
     <script src="js/main.js" type="module"></script>
+    <div id="calendar-modal" class="modal-hidden"></div>
 </body>
 </html>
