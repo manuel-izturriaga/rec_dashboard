@@ -703,7 +703,7 @@ a.campsite-card, a.campsite-card:hover {
 
 .calendar-day {
     cursor: pointer;
-    border-radius: 50%;
+    border-radius: 0;
     transition: background-color 0.2s;
     box-sizing: border-box;
 }
@@ -733,13 +733,13 @@ a.campsite-card, a.campsite-card:hover {
 }
 
 .calendar-day.range-start {
-    border-top-left-radius: 50%;
-    border-bottom-left-radius: 50%;
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
 }
 
 .calendar-day.range-end {
-    border-top-right-radius: 50%;
-    border-bottom-right-radius: 50%;
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
 }
 
 .calendar-footer {
