@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>All Campgrounds</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div class="container mx-auto p-4">
+        <h1 class="text-3xl font-bold mb-6 w-full text-center">All Campgrounds</h1>
+        <nav class="w-full text-center mb-4">
+            <a href="index.html" class="text-blue-500 hover:underline">Campsites</a> |
+            <a href="reservations.html" class="text-blue-500 hover:underline" title="View Reservations">Reservations</a> |
+            <a href="all-campgrounds.html" class="text-blue-500 hover:underline">All Campgrounds</a>
+        </nav>
+        <div class="overflow-x-auto">
+            <table class="min-w-full bg-white">
+                <thead class="bg-gray-800 text-white">
+                    <tr>
+                        <th class="w-1/3 text-left py-3 px-4 uppercase font-semibold text-sm">Name</th>
+                        <th class="w-1/3 text-left py-3 px-4 uppercase font-semibold text-sm">Type</th>
+                        <th class="text-left py-3 px-4 uppercase font-semibold text-sm">State</th>
+                    </tr>
+                </thead>
+                <tbody id="campgrounds-table-body" class="text-gray-700">
+                    <!-- Data will be populated here -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <script src="js/all-campgrounds.js" type="module"></script>
+</body>
+</html>
