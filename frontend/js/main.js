@@ -28,12 +28,9 @@ let selectionEnd = null;
 let calendarDate = new Date();
 
 function openCalendarModal() {
-    const inputRect = dateRangeDisplay.getBoundingClientRect();
-    calendarModal.style.left = `${inputRect.left}px`;
-    calendarModal.style.top = `${inputRect.bottom + window.scrollY}px`;
-
     calendarModal.innerHTML = createInteractiveCalendar(calendarDate, { start: selectionStart, end: selectionEnd });
     calendarModal.classList.remove('modal-hidden');
+
     // Add event listeners for the modal buttons
     document.getElementById('cancel-calendar-btn').addEventListener('click', closeCalendarModal);
     document.getElementById('clear-calendar-btn').addEventListener('click', () => {
@@ -68,6 +65,8 @@ function openCalendarModal() {
 function closeCalendarModal() {
     calendarModal.classList.add('modal-hidden');
     calendarModal.innerHTML = '';
+
+    // Clean up event listeners
 }
 
 function handleDayClick(e) {

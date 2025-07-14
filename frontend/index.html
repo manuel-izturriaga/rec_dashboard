@@ -25,32 +25,33 @@
 
         <div id="filter-section">
             <div class="filter-group">
-                <label for="campground-select">Campground:</label>
+                <!--<label for="campground-select">Campground:</label>-->
                 <select id="campground-select">
                     <option value="232515">Anderson Road</option>
                     <option value="232702">Seven Points</option>
                 </select>
             </div>
-            <div class="filter-group">
-                <label for="date-range-display">Month:</label>
+            <div class="filter-group" style="position: relative;">
+                <!--<label for="date-range-display">Month:</label>-->
                 <input type="text" id="date-range-display" readonly placeholder="Select a date range">
+                <div id="calendar-modal" class="modal-hidden"></div>
             </div>
             <div class="filter-group">
-                <label for="type-filter">Campsite Type:</label>
+                <!--<label for="type-filter">Campsite Type:</label>-->
                 <select id="type-filter">
                     <option value="all">All Types</option>
                     <!-- Options will be populated by JS -->
                 </select>
             </div>
             <div class="filter-group">
-                <label for="driveway-filter">Driveway:</label>
+                <!--<label for="driveway-filter">Driveway:</label>-->
                 <select id="driveway-filter">
                     <option value="all">All Driveways</option>
                     <!-- Options will be populated by JS -->
                 </select>
             </div>
             <div class="filter-group">
-                <label for="status-filter">Status:</label>
+                <!--<label for="status-filter">Status:</label>-->
                 <select id="status-filter">
                     <option value="all">All Statuses</option>
                     <option value="Open">Open</option>
@@ -95,6 +96,5 @@
     </div>
 
     <script src="js/main.js" type="module"></script>
-    <div id="calendar-modal" class="modal-hidden"></div>
 </body>
 </html>
