@@ -645,6 +645,8 @@ a.campsite-card, a.campsite-card:hover {
 
 #calendar-modal {
     position: absolute;
+    top: 100%;
+    left: 0;
     background-color: #607193;
     border: 1px solid #4a5568;
     border-radius: 8px;

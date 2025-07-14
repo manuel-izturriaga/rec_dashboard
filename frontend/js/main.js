@@ -27,21 +27,9 @@ let selectionStart = null;
 let selectionEnd = null;
 let calendarDate = new Date();
 
-function updateCalendarPosition() {
-    const inputRect = dateRangeDisplay.getBoundingClientRect();
-    calendarModal.style.left = `${inputRect.left}px`;
-    calendarModal.style.top = `${inputRect.bottom + window.scrollY}px`;
-}
-
 function openCalendarModal() {
-    updateCalendarPosition();
-
     calendarModal.innerHTML = createInteractiveCalendar(calendarDate, { start: selectionStart, end: selectionEnd });
     calendarModal.classList.remove('modal-hidden');
-
-    // Add event listeners for window resize and scroll
-    window.addEventListener('resize', updateCalendarPosition);
-    window.addEventListener('scroll', updateCalendarPosition, true);
 
     // Add event listeners for the modal buttons
     document.getElementById('cancel-calendar-btn').addEventListener('click', closeCalendarModal);
@@ -79,8 +67,6 @@ function closeCalendarModal() {
     calendarModal.innerHTML = '';
 
     // Clean up event listeners
-    window.removeEventListener('resize', updateCalendarPosition);
-    window.removeEventListener('scroll', updateCalendarPosition, true);
 }
 
 function handleDayClick(e) {
