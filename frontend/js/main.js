@@ -502,7 +502,7 @@ window.onload = async function() {
     await handleApiParamsChange(); // Trigger initial data fetch and display
 
     // Set the Type filter to "Standard Electric"
-    typeFilter.value = "Standard Electric";
+    typeFilter.value = "STANDARD ELECTRIC"; // Assuming this is the correct value for the type filter
     applyFilters();
 };
 // Sticky filter section logic
