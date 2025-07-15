@@ -50,6 +50,22 @@ function openCalendarModal() {
             closeCalendarModal();
         }
     });
+
+    document.getElementById('open-calendar-btn').addEventListener('click', () => {
+        const year = calendarDate.getFullYear();
+        const month = calendarDate.getMonth();
+        selectionStart = new Date(Date.UTC(year, month, 1));
+        selectionEnd = new Date(Date.UTC(year, month + 1, 0));
+
+        const options = { year: 'numeric', month: 'short', day: 'numeric', timeZone: 'UTC' };
+        let dateStr = selectionStart.toLocaleDateString('en-US', options);
+        if (selectionEnd) {
+            dateStr += ` - ${selectionEnd.toLocaleDateString('en-US', options)}`;
+        }
+        dateRangeDisplay.value = dateStr;
+        applyFilters();
+        closeCalendarModal();
+    });
     document.getElementById('prev-month-btn').addEventListener('click', () => {
         calendarDate.setMonth(calendarDate.getMonth() - 1);
         openCalendarModal();
