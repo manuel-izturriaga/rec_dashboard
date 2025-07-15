@@ -291,7 +291,7 @@ export function createCampsiteCard(campsite, currentStartDate, selectedDays = []
     // --- End Availability Display Logic ---
 
     const headerClass = isWaterfrontSite ? 'card-header waterfront-header' : 'card-header';
-    const headerContent = isWaterfrontSite ? `<h2>🌊 ${campsite.name || 'Campsite'}</h2>` : `<h2>${campsite.name || 'Campsite'}</h2>`;
+    const headerContent = `<h2>${isWaterfrontSite ? '🌊 ' : ''}${campsite.name || 'Campsite'}</h2>`;
 
     card.innerHTML = `
         <div class="type-badge">${campsite.type ? campsite.type.split(' ')[0].toUpperCase() : 'UNKNOWN'}</div>
