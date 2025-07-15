@@ -173,9 +173,10 @@ export function createInteractiveCalendar(date, selection = {}) {
     let html = `
         <div class="calendar-container">
             <div class="calendar-header">
-                <button id="prev-month-btn"><</button>
+                <i id="prev-month-btn" class="calendar-nav-icon"><</i>
                 <h3 id="calendar-month-year">${monthName} ${year}</h3>
-                <button id="next-month-btn">></button>
+                <i id="search-month-btn" class="calendar-nav-icon">&#x1F50D;</i> <!-- Magnifying glass icon -->
+                <i id="next-month-btn" class="calendar-nav-icon">></i>
             </div>
             <div class="calendar-grid">
                 <div class="calendar-day-header">Mon</div>

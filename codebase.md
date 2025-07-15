@@ -1,23 +1,31 @@
-# Codebase Documentation
+# Codebase Structure
 
-This document provides an overview of the project structure and components.
+This document outlines the structure of the application, detailing each component and its function.
 
 ## Frontend
 
-The frontend is responsible for rendering the user interface and handling user interactions.
+### HTML ([`frontend/`](frontend/))
+- **[`index.html`](frontend/index.html)**: Main dashboard page.
+- **[`reservations.html`](frontend/reservations.html)**: Page for managing reservations.
+- **[`all-campgrounds.html`](frontend/all-campgrounds.html)**: Page for viewing all campgrounds.
 
-### `frontend/js/all-campgrounds.js`
+### CSS ([`frontend/css/`](frontend/css/))
+- **[`style.css`](frontend/css/style.css)**: Main stylesheet for the application.
 
-This file manages the "All Campgrounds" page.
+### JavaScript ([`frontend/js/`](frontend/js/))
+- **[`main.js`](frontend/js/main.js)**: Main JavaScript file for the dashboard page. Handles event listeners and initial data fetching.
+- **[`ui.js`](frontend/js/ui.js)**: Handles UI updates and manipulations.
+- **[`api.js`](frontend/js/api.js)**: Manages all interactions with the backend API.
+- **[`reservations.js`](frontend/js/reservations.js)**: JavaScript for the reservations page.
+- **[`all-campgrounds.js`](frontend/js/all-campgrounds.js)**: JavaScript for the all-campgrounds page.
 
-**Key Functions:**
+### Data (`frontend/data/`)
+- **[`Facilities_API_v1.json`](frontend/data/Facilities_API_v1.json)**: JSON data for campground facilities.
+- **[`FacilityAddresses_API_v1.json`](frontend/data/FacilityAddresses_API_v1.json)**: JSON data for facility addresses.
 
-*   **`Promise.all([...])`**: Concurrently fetches campground data from `data/Facilities_API_v1.json` and address data from `data/FacilityAddresses_API_v1.json`.
-*   **`mergeData(facilities, addresses)`**: Merges the two datasets based on `FacilityID`, creating a unified data source.
-*   **`populateStateFilter()`**: Populates the state filter dropdown using the `AddressStateCode` from the merged data.
-*   **`renderTable(data)`**: Renders the list of campgrounds, now including `City` and `AddressStateCode`.
-*   **`filterAndRender()`**: Filters campgrounds based on the selected state (`AddressStateCode`) and search term.
+## Backend
 
-### `frontend/all-campgrounds.html`
+- **[`backend/server.js`](backend/server.js)**: The main server file, built with Express.js. It handles API requests, serves static files, and manages application routes.
 
-The HTML structure for the "All Campgrounds" page. It includes the table, filters, and search bar.
+## Documentation (`docs/`)
+- This directory contains all project documentation, including plans and brainstorming files.

@@ -773,3 +773,18 @@ a.campsite-card, a.campsite-card:hover {
 .waterfront-header {
   background-color: #add8e6; /* lightblue */
 }
+.calendar-nav-icon {
+    cursor: pointer;
+    padding: 5px;
+    border-radius: 50%;
+    transition: background-color 0.2s;
+    font-style: normal; /* Remove italic styling from <i> tag */
+}
+
+.calendar-nav-icon:hover {
+    background-color: #4a5568;
+}
+
+#search-month-btn {
+    font-size: 1.2em;
+}

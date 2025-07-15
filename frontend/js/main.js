@@ -59,6 +59,14 @@ function openCalendarModal() {
     });
     document.querySelector('.calendar-grid').addEventListener('click', handleDayClick);
     document.getElementById('calendar-month-year').addEventListener('click', showMonthSelector);
+    document.getElementById('search-month-btn').addEventListener('click', () => {
+        if (!selectionStart && !selectionEnd) {
+            currentStartDate = new Date(calendarDate);
+            currentStartDate.setDate(1);
+            handleApiParamsChange();
+            closeCalendarModal();
+        }
+    });
 }
 
 function closeCalendarModal() {
