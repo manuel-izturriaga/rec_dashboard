@@ -6,7 +6,6 @@ const campgroundSelect = document.getElementById('campground-select');
 const dateRangeDisplay = document.getElementById('date-range-display');
 const typeFilter = document.getElementById('type-filter');
 const drivewayFilter = document.getElementById('driveway-filter');
-const statusFilter = document.getElementById('status-filter');
 const waterfrontFilter = document.getElementById('waterfront-filter');
 const currentWeekFilter = document.getElementById('current-week-filter');
 const daysOfWeekFilter = document.getElementById('days-of-week-filter');
@@ -288,7 +287,6 @@ function hasAvailabilityForRange(campsite, startDateStr, endDateStr) {
 function applyFilters() {
     const selectedType = typeFilter.value;
     const selectedDriveway = drivewayFilter.value;
-    const selectedStatus = statusFilter.value;
     const isWaterfrontChecked = waterfrontFilter.checked;
     const isCurrentWeekChecked = currentWeekFilter.checked;
     // Get selected day numbers from the multi-select (0 for Sun, 1 for Mon, etc.)
@@ -299,6 +297,10 @@ function applyFilters() {
     const endDate = selectionEnd ? selectionEnd.toISOString().split('T')[0] : '';
 
     const filteredCampsites = originalCampsites.filter(campsite => {
+        // Status filter
+        if (campsite.campsite_status !== "Open") {
+            return false;
+        }
         // Combined availability filter for current week and selected days
         if (isCurrentWeekChecked) {
             const today = new Date();
@@ -365,11 +367,6 @@ function applyFilters() {
             }
         }
 
-        // Status filter
-        if (selectedStatus !== 'all' && campsite.campsite_status !== selectedStatus) {
-            return false;
-        }
-
         // Waterfront filter
         if (isWaterfrontChecked) {
             if (!isWaterfront(campsite)) {
@@ -388,7 +385,6 @@ function applyFilters() {
 function resetFilters() {
     typeFilter.value = 'all';
     drivewayFilter.value = 'all';
-    statusFilter.value = 'all';
     waterfrontFilter.checked = false;
     currentWeekFilter.checked = false;
     // Clear all selected options in the days of week filter
@@ -439,7 +435,6 @@ campgroundSelect.addEventListener('change', handleApiParamsChange);
 // The 'change' event on the old month input is no longer needed.
 typeFilter.addEventListener('change', applyFilters);
 drivewayFilter.addEventListener('change', applyFilters);
-statusFilter.addEventListener('change', applyFilters);
 waterfrontFilter.addEventListener('change', applyFilters);
 currentWeekFilter.addEventListener('change', applyFilters);
 // Click-to-select for days of the week, with shift-click for range selection
@@ -505,6 +500,10 @@ window.onload = async function() {
     dateRangeDisplay.placeholder = "Select a date range";
 
     await handleApiParamsChange(); // Trigger initial data fetch and display
+
+    // Set the Type filter to "Standard Electric"
+    typeFilter.value = "Standard Electric";
+    applyFilters();
 };
 // Sticky filter section logic
 const filterSection = document.getElementById('filter-section');
