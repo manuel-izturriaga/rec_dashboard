@@ -1,5 +1,5 @@
 import { fetchCombinedData } from './api.js';
-import { displayCampsites, createInteractiveCalendar, createMonthSelectorView } from './ui.js';
+import { displayCampsites, createInteractiveCalendar, createMonthSelectorView, isWaterfront } from './ui.js';
 
 // DOM elements
 const campgroundSelect = document.getElementById('campground-select');
@@ -370,23 +370,9 @@ function applyFilters() {
             return false;
         }
 
-        // Waterfront filter with conditional logic based on campground name
+        // Waterfront filter
         if (isWaterfrontChecked) {
-            const siteNumber = parseInt(campsite.name, 10);
-            if (isNaN(siteNumber)) return false; // Not a numbered site, filter it out
-
-            const selectedCampgroundName = campgroundSelect.options[campgroundSelect.selectedIndex].text;
-
-            if (selectedCampgroundName === "Anderson Road") {
-                if (siteNumber < 1 || siteNumber > 9) {
-                    return false;
-                }
-            } else if (selectedCampgroundName === "Seven Points") {
-                if (siteNumber < 11 || siteNumber > 35 || siteNumber % 2 === 0) {
-                    return false;
-                }
-            } else {
-                // If waterfront is checked for a campground without special rules, filter out all sites.
+            if (!isWaterfront(campsite)) {
                 return false;
             }
         }
