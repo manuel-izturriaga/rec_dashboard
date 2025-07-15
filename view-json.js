@@ -3,7 +3,7 @@ const path = require('path');
 
 // The script expects the file path as a command-line argument.
 // If no argument is provided, it will default to the one from the user's context.
-const defaultPath = '../../Downloads/RecFac/Facilities_API_v1.json';
+const defaultPath = 'data/Facilities_API_v1.json';
 const filePathArg = process.argv[2];
 
 const jsonFilePath = path.resolve(__dirname, filePathArg || defaultPath);
