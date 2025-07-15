@@ -39,6 +39,24 @@ function isGroupSite(campsite) {
            reserveType.includes('GROUP');
 }
 
+export function isWaterfront(campsite) {
+    const siteNumber = parseInt(campsite.name, 10);
+    if (isNaN(siteNumber)) return false;
+
+    // This logic is based on the currently selected campground, which is not ideal.
+    // A better approach would be to have this information as part of the campsite data itself.
+    // For now, we'll keep the logic as it was in main.js
+    const campgroundSelect = document.getElementById('campground-select');
+    const selectedCampgroundName = campgroundSelect.options[campgroundSelect.selectedIndex].text;
+
+    if (selectedCampgroundName === "Anderson Road") {
+        return siteNumber >= 1 && siteNumber <= 9;
+    } else if (selectedCampgroundName === "Seven Points") {
+        return siteNumber >= 11 && siteNumber <= 35 && siteNumber % 2 !== 0;
+    }
+    return false;
+}
+
 function generateCalendarGrid(startDate, availability, selectedDays, isCurrentWeek) {
     let html = '<div class="daily-availability">';
     const year = startDate.getFullYear();
@@ -241,6 +259,11 @@ export function createCampsiteCard(campsite, currentStartDate, selectedDays = []
     card.target = '_blank';
     card.rel = 'noopener noreferrer';
 
+    const isWaterfrontSite = isWaterfront(campsite);
+    if (isWaterfrontSite) {
+        card.classList.add('waterfront');
+    }
+
     // Extract common attributes using the helper function
     const electricHookup = getAttributeValue(campsite.attributes, 'Electric Hookup');
     const waterHookup = getAttributeValue(campsite.attributes, 'Water Hookup');
@@ -267,10 +290,13 @@ export function createCampsiteCard(campsite, currentStartDate, selectedDays = []
     const availabilityHtml = generateCalendarGrid(currentStartDate, campsite.availability, selectedDays, isCurrentWeek);
     // --- End Availability Display Logic ---
 
+    const headerClass = isWaterfrontSite ? 'card-header waterfront-header' : 'card-header';
+    const headerContent = `<h2>${isWaterfrontSite ? '🌊 ' : ''}${campsite.name || 'Campsite'}</h2>`;
+
     card.innerHTML = `
         <div class="type-badge">${campsite.type ? campsite.type.split(' ')[0].toUpperCase() : 'UNKNOWN'}</div>
-        <div class="card-header">
-            <h2>${campsite.name || 'Campsite'}</h2>
+        <div class="${headerClass}">
+            ${headerContent}
             <span class="campsite-id">ID: ${campsite.campsite_id || 'N/A'}</span>
         </div>
 
