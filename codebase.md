@@ -1,44 +1,23 @@
-# Codebase Overview
+# Codebase Documentation
 
-This document provides an overview of the project's structure and components.
+This document provides an overview of the project structure and components.
 
 ## Frontend
 
-### HTML (`frontend/index.html`)
+The frontend is responsible for rendering the user interface and handling user interactions.
 
-- Main page of the dashboard.
+### `frontend/js/all-campgrounds.js`
 
-### CSS (`frontend/css/style.css`)
+This file manages the "All Campgrounds" page.
 
-- Contains all the styling for the application.
+**Key Functions:**
 
-### JavaScript
+*   **`Promise.all([...])`**: Concurrently fetches campground data from `data/Facilities_API_v1.json` and address data from `data/FacilityAddresses_API_v1.json`.
+*   **`mergeData(facilities, addresses)`**: Merges the two datasets based on `FacilityID`, creating a unified data source.
+*   **`populateStateFilter()`**: Populates the state filter dropdown using the `AddressStateCode` from the merged data.
+*   **`renderTable(data)`**: Renders the list of campgrounds, now including `City` and `AddressStateCode`.
+*   **`filterAndRender()`**: Filters campgrounds based on the selected state (`AddressStateCode`) and search term.
 
-#### `frontend/js/main.js`
+### `frontend/all-campgrounds.html`
 
-- Main entry point for the frontend JavaScript.
-- Initializes the application and handles user interactions.
-
-#### `frontend/js/ui.js`
-
-- Handles UI-related logic, such as creating and managing UI components like the calendar. The calendar is now positioned using CSS, and the scroll/resize event listeners have been removed from `main.js`.
-
-#### `frontend/js/api.js`
-
-- Manages communication with the backend API.
-
-#### `frontend/js/reservations.js`
-
-- Logic specific to the reservations page.
-
-#### `frontend/js/all-campgrounds.js`
-
-- Fetches and displays a list of all campgrounds.
-- Includes a state filter and search bar to allow users to narrow down the results.
-- Shows additional details for each campground, including city, state, type, and whether it is reservable.
-
-## Backend
-
-### `backend/server.js`
-
-- The main server file, likely running an Express server.
+The HTML structure for the "All Campgrounds" page. It includes the table, filters, and search bar.
