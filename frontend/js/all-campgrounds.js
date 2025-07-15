@@ -52,15 +52,35 @@ document.addEventListener('DOMContentLoaded', () => {
         let html = '';
         if (data.length > 0) {
             data.forEach(campground => {
-                html += `
-                    <tr class="border-b">
-                        <td class="py-3 px-4">${campground.FacilityName}</td>
-                        <td class="py-3 px-4">${campground.City || 'N/A'}</td>
-                        <td class="py-3 px-4">${campground.AddressStateCode || 'N/A'}</td>
-                        <td class="py-3 px-4">${campground.FacilityTypeDescription}</td>
-                        <td class="py-3 px-4">${campground.Reservable ? 'Yes' : 'No'}</td>
-                    </tr>
-                `;
+                const row = document.createElement('tr');
+                row.className = 'border-b';
+
+                const nameCell = document.createElement('td');
+                nameCell.className = 'py-3 px-4';
+                nameCell.textContent = campground.FacilityName;
+                row.appendChild(nameCell);
+
+                const cityCell = document.createElement('td');
+                cityCell.className = 'py-3 px-4';
+                cityCell.textContent = campground.City || 'N/A';
+                row.appendChild(cityCell);
+
+                const stateCell = document.createElement('td');
+                stateCell.className = 'py-3 px-4';
+                stateCell.textContent = campground.AddressStateCode || 'N/A';
+                row.appendChild(stateCell);
+
+                const typeCell = document.createElement('td');
+                typeCell.className = 'py-3 px-4';
+                typeCell.textContent = campground.FacilityTypeDescription;
+                row.appendChild(typeCell);
+
+                const reservableCell = document.createElement('td');
+                reservableCell.className = 'py-3 px-4';
+                reservableCell.textContent = campground.Reservable ? 'Yes' : 'No';
+                row.appendChild(reservableCell);
+
+                tableBody.appendChild(row);
             });
         } else {
             html = '<tr><td colspan="5" class="text-center py-4">No campgrounds match your criteria.</td></tr>';
