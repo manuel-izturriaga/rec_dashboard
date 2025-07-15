@@ -31,6 +31,12 @@ This document provides an overview of the project's structure and components.
 
 - Logic specific to the reservations page.
 
+#### `frontend/js/all-campgrounds.js`
+
+- Fetches and displays a list of all campgrounds.
+- Includes a state filter and search bar to allow users to narrow down the results.
+- Shows additional details for each campground, including city, state, type, and whether it is reservable.
+
 ## Backend
 
 ### `backend/server.js`
